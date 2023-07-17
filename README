@@ -1,0 +1,20 @@
+#summery
+This is first code of Deep Learning by C-lang.
+
+#opotunity
+Only for code learning.
+
+#how to use
+1. configure parameter in source file
+2. execute make.bat
+3. execute a.exe
+
+#structure
+>gradient_descent.c
+    main code
+    
+>gradient.c 
+
+>loss_function.c
+
+>matrix.c
