@@ -7,11 +7,11 @@
 #include "two_layer_net.h"
 #include "loss_function.h"
 #include "gradient.h"
+#include "teacher_file.h"
 
 #define REPEAT_COUNT (100)
 #define REPEAT_COUNT2 (300)
 #define RATE (0.1)
-#define MAX_SIZE_TEACHER (100)
 
 #define D_DEBUG
 #define MULTI
@@ -129,78 +129,4 @@ void init(S_MATRIX* W,S_MATRIX* B,double **pnet_value){
     for(i=0;i<n;i++){
         *(pnet_value[i])=rand()%100/100.0;
     }
-}
-
-/*教師データをデータファイルから読み込む*/
-//引数　size_X  入力パラメタ数
-//      size_T  出力パラメタ数
-//      X:入力データの行列 
-//      T:正解データの行列
-//戻り値    正数：データの総数
-//          -1:ファイルエラー
-//          -2:ポインタエラー
-//          -3:そのほかのエラー
-int read_teacher_data(int *size_X,int *size_T,S_MATRIX *X,S_MATRIX *T){
-    int block_size=0;
-    int size_teacher=0;
-    double buf;
-    FILE * fp=NULL;
-    //NULL check
-    if(size_X==NULL||size_T==NULL){
-        return -2;
-    }
-    //File open
-    fp=fopen("teacher.dat","r");
-    if(fp==NULL){
-        return -1;
-    }
-
-    //read file
-    fscanf(fp,"%d",&size_teacher);
-    fscanf(fp,"%d",size_X);
-    fscanf(fp,"%d",size_T);
-    if(&size_X==0||&size_T==0){
-        return -1;
-    }
-
-    //暫定的に入力サイズが閾値を超えた場合は読み込む教師データ数を制限するものとする
-    if(size_teacher>MAX_SIZE_TEACHER){
-        size_teacher=MAX_SIZE_TEACHER;
-    }
-    block_size= *size_T * *size_X;
-
-    //データセット変数の作成
-    for(int i=0;i<size_teacher;i++){
-        F_CREATE_MATRIX(1,*size_X,&X[i]);
-        F_CREATE_MATRIX(1,*size_T,&T[i]);
-    }
-
-    //read data
-    for(int i=0;i<size_teacher*block_size;i++){
-        char ret=fscanf(fp,"%lf",&buf);
-        if(ret==EOF){
-            for(int k=0;k<i;k++){
-                F_DELETE_MATRIX(&X[k]);
-                F_DELETE_MATRIX(&T[k]);
-            }
-            return -1;
-        }
-        int block_num=i/block_size;
-        int data_pos=i%block_size;
-        #ifdef D_DEBUG
-            printf("#debug line:%d  dataset_num:%d  data_pos:%d \n",i+4,block_num,data_pos);
-            if(data_pos<*size_X){
-                printf("#debug data:%f is storage in X[%d] (0,%d)\n",buf,block_num,data_pos);
-                X[block_num].elep[data_pos]=buf;
-            }else{
-                printf("#debug data:%f is storage in T[%d] (0,%d)\n",buf,block_num,data_pos-*size_X);
-            }    
-        #endif
-        if(data_pos<*size_X){
-            X[block_num].elep[data_pos]=buf;
-        }else{
-            T[block_num].elep[data_pos-*size_X]=buf;
-        }
-    }
-    return size_teacher;
 }
