@@ -2,11 +2,12 @@
 #define TEACHER_H
 
 #define MAX_SIZE_TEACHER (100)
-#define DATA_FILE_NAME "teacher.dat"
+#define TEACHER_FILE_NAME "teacher.dat"
 
 #include"matrix.h"
 
 int read_teacher_data(int *size_X,int *size_T,S_MATRIX *X,S_MATRIX *T);
 int add_teacher_data(int size_X,int size_T,S_MATRIX X,S_MATRIX T);
-int get_teacher
+int get_teacher_file_info(int * size_teacher,int * size_X,int *size_T);
+int init_teacher_file(int size_X,int size_T);
 #endif

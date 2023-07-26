@@ -21,25 +21,25 @@ int read_teacher_data(int *size_X,int *size_T,S_MATRIX *X,S_MATRIX *T);
 
 int main(void){
     srand((unsigned int)time(NULL));
+    int size_input,size_output;
     int i,j,k,n,ret;
     int size_teacher=0;
-    int parm_size_input=0;
-    int parm_size_output=0;
+    FILE * fp;
+    fp=fopen("data.dat","w");
     S_MATRIX W[2];
     S_MATRIX B[2];
     S_MATRIX Y;
     S_MATRIX X[MAX_SIZE_TEACHER];
     S_MATRIX T[MAX_SIZE_TEACHER];
 
-    FILE * fp;
-    fp=fopen("tmp.dat","w");
-    size_teacher=read_teacher_data(&parm_size_input,&parm_size_output,X,T);
+    //教師データを読み込む
+    size_teacher=read_teacher_data(&size_input,&size_output,X,T);
     if(size_teacher<0){
         printf("ERROR occor in \"read_teacher_data\"\n");
         printf("error code %d\n",size_teacher);
     }
     #ifdef D_DEBUG
-    printf("%d %d %d\n",size_teacher,parm_size_input,parm_size_output);
+    printf("%d %d %d\n",size_teacher,size_input,size_output);
     for(i=0;i<size_teacher;i++){
         printf("data set %d \n",i);
         F_PRINT(&X[i]);
@@ -49,11 +49,12 @@ int main(void){
     }
     #endif
 
-    F_CREATE_MATRIX(1,OUTPUT_SIZE,&Y);
-    F_CREATE_MATRIX(INPUT_SIZE,HIDEN_SIZE,&W[0]);
-    F_CREATE_MATRIX(HIDEN_SIZE,OUTPUT_SIZE,&W[1]);
+    //学習用パラメータをセット
+    F_CREATE_MATRIX(1,size_output,&Y);
+    F_CREATE_MATRIX(size_input,HIDEN_SIZE,&W[0]);
+    F_CREATE_MATRIX(HIDEN_SIZE,size_output,&W[1]);
     F_CREATE_MATRIX(1,HIDEN_SIZE,&B[0]);
-    F_CREATE_MATRIX(1,OUTPUT_SIZE,&B[1]);
+    F_CREATE_MATRIX(1,size_output,&B[1]);
 
     int size_net=calc_size_net(W,B);    
     double **pnet_value=malloc(sizeof(double)*size_net);
@@ -61,6 +62,8 @@ int main(void){
 
     init(W,B,pnet_value);
     F_PRINT(&W[0]);
+
+    //学習を実行
     for(i=0;i<REPEAT_COUNT2;i++){
         for(j=0;j<REPEAT_COUNT;j++){
 #ifdef MULTI
@@ -94,6 +97,7 @@ int main(void){
     }
     
 
+    //動的メモリの解放
     free(pnet_value);
     free(dL);
 
