@@ -10,6 +10,26 @@
 #include "teacher_file.h"
 #include "network_data.h"
 
+/*ネットワークのデータ総数を求めて返す*/
+//引数  int layer_size ネットワークの総数
+//      int *neuron_size 各層のニューロン数
+//戻り値 正数:データ総数
+//      -1:エラー
+int data_amount(int layer_size,int *neuron_size){
+    //NULL check
+    if(neuron_size==NULL){
+        return -1;
+    }
+    int ret=0;
+    for(int i=0;i<layer_size;i++){
+        ret+=neuron_size[i];
+    }
+    return ret;
+}
+
+
+
+
 /*ネットワークファイルを初期化する*/
 //引数  int layer_size  ネットワークの層数
 //      int *neuron_size 各層のニューロン数
@@ -75,9 +95,10 @@ int read_network_data(double **pnet_value){
     int layer_size,i;
     int neuron_size[MAX_LAYER_NETWORK];
     int ret;
+    int datasize;
 
     //ネットワーク情報を取得する
-    int ret=get_network_info(&layer_size,neuron_size);
+    ret=get_network_info(&layer_size,neuron_size);
     if(ret!=0){
         printf("ERROR : get_network_info\n");
         printf("\teroor code : %d\n",ret);
@@ -96,9 +117,15 @@ int read_network_data(double **pnet_value){
     }
     
     //ネットワークデータを読み込む
-    
+    datasize=data_amount(layer_size,neuron_size);
+    for(i=0;i<datasize;i++){
+        fscanf(fp,"%lf",pnet_value[i]);
+    }
 
     //ファイルを閉じる
+    fclose(fp);
+
+    return 0;
 }
 
 /*ネットワークファイルのデータを更新する*/
@@ -106,4 +133,40 @@ int read_network_data(double **pnet_value){
 //戻り値     0:正常
 //          -1:ファイル異常
 //          -2:そのほか異常
-int update_network_data(double **pnet_value);
+int update_network_data(double **pnet_value){
+    double buf;
+    int layer_size,i;
+    int neuron_size[MAX_LAYER_NETWORK];
+    int ret;
+    int datasize;
+
+    //ネットワーク情報を取得する
+    ret=get_network_info(&layer_size,neuron_size);
+    if(ret!=0){
+        printf("ERROR : get_network_info\n");
+        printf("\teroor code : %d\n",ret);
+        return -2;
+    }
+    
+    //ファイルを初期化
+    init_network_data(layer_size,neuron_size);
+
+    //ファイルにデータを追記
+    FILE * fp;
+    fp=fopen(NEURON_FILE_NAME,"a");
+    if(fp==NULL){
+        return -1;
+    }
+    datasize=data_amount(layer_size,neuron_size);
+
+    //データを更新
+    for(i=0;i<datasize;i++){
+        fprintf(fp,"%lf\n",*(pnet_value[i]));
+    }
+
+    //ファイルを閉じる
+    fclose(fp);
+
+    return 0;
+       
+}
