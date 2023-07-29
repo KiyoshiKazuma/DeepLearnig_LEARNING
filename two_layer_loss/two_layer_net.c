@@ -62,6 +62,7 @@ double sigmoid(double x) {
 int calc_size_net(S_MATRIX* W,S_MATRIX*B){
     int size=0;
     int i;
+    
     for(i=0;i<2;i++){
         size += SIZE(W[i]);
         size += SIZE(B[i]);

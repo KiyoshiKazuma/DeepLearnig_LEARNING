@@ -13,16 +13,20 @@
 /*ネットワークのデータ総数を求めて返す*/
 //引数  int layer_size ネットワークの総数
 //      int *neuron_size 各層のニューロン数
+//      int input_size 入力層のパラメータ数
+//      int output_size 出力層のパラメータ数
 //戻り値 正数:データ総数
 //      -1:エラー
-int data_amount(int layer_size,int *neuron_size){
+int net_data_amount(int layer_size,int *neuron_size,int input_size,int output_size){
     //NULL check
     if(neuron_size==NULL){
         return -1;
     }
     int ret=0;
-    for(int i=0;i<layer_size;i++){
-        ret+=neuron_size[i];
+    ret+=input_size*neuron_size[0];
+    ret+=output_size*neuron_size[layer_size-1];
+    for(int i=0;i<layer_size-1;i++){
+        ret+=neuron_size[i]*neuron_size[i+1];
     }
     return ret;
 }
@@ -90,7 +94,7 @@ int get_network_info(int *layer_size,int *neuron_size){
 //戻り値     0:正常
 //          -1:ファイル異常
 //          -2:そのほか異常
-int read_network_data(double **pnet_value){
+int read_network_data(double **pnet_value,int net_amount){
     double buf;
     int layer_size,i;
     int neuron_size[MAX_LAYER_NETWORK];
@@ -117,8 +121,7 @@ int read_network_data(double **pnet_value){
     }
     
     //ネットワークデータを読み込む
-    datasize=data_amount(layer_size,neuron_size);
-    for(i=0;i<datasize;i++){
+    for(i=0;i<net_amount;i++){
         fscanf(fp,"%lf",pnet_value[i]);
     }
 
@@ -133,7 +136,7 @@ int read_network_data(double **pnet_value){
 //戻り値     0:正常
 //          -1:ファイル異常
 //          -2:そのほか異常
-int update_network_data(double **pnet_value){
+int update_network_data(double **pnet_value,int net_amount){
     double buf;
     int layer_size,i;
     int neuron_size[MAX_LAYER_NETWORK];
@@ -157,10 +160,8 @@ int update_network_data(double **pnet_value){
     if(fp==NULL){
         return -1;
     }
-    datasize=data_amount(layer_size,neuron_size);
-
     //データを更新
-    for(i=0;i<datasize;i++){
+    for(i=0;i<net_amount;i++){
         fprintf(fp,"%lf\n",*(pnet_value[i]));
     }
 
