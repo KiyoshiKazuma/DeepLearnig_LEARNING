@@ -42,9 +42,11 @@ int main(void){
     int i,j,k,n,ret;
     int size_teacher=0;
     int layer_size=1;
-    int neuron_layer={3};
-    S_MATRIX W[2];
+    int neuron_layer[1]={3};
+    S_MATRIX W[2];  
     S_MATRIX B[2];
+    size_input=2;
+    size_output=2;
 
     //学習用パラメータをセット
     F_CREATE_MATRIX(size_input,HIDEN_SIZE,&W[0]);
@@ -52,13 +54,16 @@ int main(void){
     F_CREATE_MATRIX(1,HIDEN_SIZE,&B[0]);
     F_CREATE_MATRIX(1,size_output,&B[1]);
 
-    int size_net=calc_size_net(W,B);    
-    double **pnet_value=malloc(sizeof(double)*size_net);
+//    init_network_data(layer_size,neuron_layer);
+    int netamount=net_data_amount(layer_size,neuron_layer,size_input,size_output);
 
+    double **pnet_value=malloc(sizeof(double)*netamount);
     init(W,B,pnet_value);
 
-    init_network_data(layer_size,neuron_layer);
-
+    printf("net amount : %d\n",netamount);
+//    update_network_data(pnet_value,netamount);
+        read_network_data(pnet_value,netamount);
+        F_PRINT(&W[0]);
 
     //動的メモリの解放
     free(pnet_value);

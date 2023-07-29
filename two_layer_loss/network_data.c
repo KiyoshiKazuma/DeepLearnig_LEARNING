@@ -51,6 +51,7 @@ int init_network_data(int layer_size,int *neuron_size){
     for(int i=0;i<layer_size;i++){
         fprintf(fp,"%d\n",neuron_size[i]);
     }
+    fclose(fp);
     return 0;
 }
 
