@@ -36,8 +36,7 @@ void init(S_MATRIX* W,S_MATRIX* B,double **pnet_value){
 }
 
 
-int main(){
-    srand((unsigned int)time(NULL));
+int main(void){
     int size_input,size_output;
     int i,j,k,n,ret;
     int size_teacher;
@@ -49,30 +48,13 @@ int main(){
     size_output=2;
     layer_size=1;
 
-    //教師データを読み込む
-    printf("##phase (1)\n");
-    if(get_teacher_file_info(&size_teacher,&size_input,&size_output)!=0){
-        printf("EROOR : FUNC \"get_teacher_file_info\"\n");
-        return 1;
-    }
-    S_MATRIX X[size_teacher];
-    S_MATRIX T[size_teacher];
+    
+    S_MATRIX X;
     S_MATRIX Y;
-    S_MATRIX T_test;
-    for(i=0;i<size_teacher;i++){
-        F_CREATE_MATRIX(1,size_input,&X[i]);
-        F_CREATE_MATRIX(1,size_output,&T[i]);        
-    }
+    F_CREATE_MATRIX(1,size_input,&X);
     F_CREATE_MATRIX(1,size_output,&Y);
-    F_CREATE_MATRIX(1,size_output,&T_test);
-    read_teacher_data(&size_input,&size_output,X,T);
-
-    F_PRINT(&X[0]);
-    F_PRINT(&T[0]);
     
     //学習用パラメータをセット
-    printf("##phase (2)\n");
-
     S_MATRIX W[layer_size+1];  
     S_MATRIX B[layer_size+1];
     F_CREATE_MATRIX(size_input,HIDEN_SIZE,&W[0]);
@@ -81,34 +63,22 @@ int main(){
     F_CREATE_MATRIX(1,size_output,&B[1]);
 
     //ネットワークデータを読み込み
-    printf("##phase (3)\n");
     get_network_info(&layer_size,neuron_layer);
     netamount=net_data_amount(layer_size,neuron_layer,size_input,size_output);
-    printf("%d\n",netamount);
     double **pnet_value=malloc(sizeof(double)*netamount);
     init(W,B,pnet_value);
-    update_network_data(pnet_value,netamount);
     read_network_data(pnet_value,netamount);
-
-    F_PRINT(&W[0]);
-    F_PRINT(&B[0]);
-    F_PRINT(&W[1]);
-    F_PRINT(&B[1]);
-
 
 
 /***********以下にテスト用コードを記述*****************************/
 
-    printf("##phase (4)\n");
-    
-    double Loss=0;
-    for(i=0;i<size_teacher;i++){
-        ret=two_layer_net(&X[i],&Y,W,B);
-        F_PRINT(&X[i]);
-        F_PRINT(&T[i]);
-        F_PRINT(&Y);
-        printf("%lf  %lf\n\n",mean_squared_error(&Y,&T[i]),cross_entropy_error(&Y,&T[i]));    
-    }
+    printf("put input data \"x1 x2\" :");
+    scanf("%lf %lf",&X.elep[0],&X.elep[1]);
+    two_layer_net(&X,&Y,W,B);
+    printf("input data\n");
+    F_PRINT(&X);
+    printf("output data\n");
+    F_PRINT(&Y);
 /******************************************************************/
 
 //動的メモリの解放

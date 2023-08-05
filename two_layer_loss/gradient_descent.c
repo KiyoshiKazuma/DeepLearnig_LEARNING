@@ -8,21 +8,22 @@
 #include "loss_function.h"
 #include "gradient.h"
 #include "teacher_file.h"
+#include "network_data.h"
 
-#define REPEAT_COUNT (100)
-#define REPEAT_COUNT2 (300)
+#define REPEAT_COUNT (10)
+#define REPEAT_COUNT2 (100)
 #define RATE (0.1)
 
 #define D_DEBUG
 #define MULTI
 
 void init(S_MATRIX* W,S_MATRIX* B,double **pnet_value);
-int read_teacher_data(int *size_X,int *size_T,S_MATRIX *X,S_MATRIX *T);
 
 int main(void){
     srand((unsigned int)time(NULL));
     int size_input,size_output;
-    int i,j,k,n,ret;
+    int j,k;
+    unsigned long i;
     int size_teacher=0;
     FILE * fp;
     fp=fopen("data.dat","w");
@@ -38,16 +39,6 @@ int main(void){
         printf("ERROR occor in \"read_teacher_data\"\n");
         printf("error code %d\n",size_teacher);
     }
-    #ifdef D_DEBUG
-    printf("%d %d %d\n",size_teacher,size_input,size_output);
-    for(i=0;i<size_teacher;i++){
-        printf("data set %d \n",i);
-        F_PRINT(&X[i]);
-        printf("V  V  V  V  V  V  V  V\n",i);
-        F_PRINT(&T[i]);
-        printf("\n\n");
-    }
-    #endif
 
     //学習用パラメータをセット
     F_CREATE_MATRIX(1,size_output,&Y);
@@ -61,41 +52,45 @@ int main(void){
     double * dL = malloc(sizeof(double)*size_net);
 
     init(W,B,pnet_value);
-    F_PRINT(&W[0]);
 
+    //ネットワーク変数の初期値をランダムに生成
+    //OR
+    //ネットワークデータを読み込み
+    printf("init network file? (y/n) :");
+    char cmd;
+    scanf("%c",&cmd);
+    if(cmd=='y'){
+        for(i=0;i<size_net;i++){
+            *(pnet_value[i])=rand()%100/100.0;
+        }
+    }else{
+        read_network_data(pnet_value,size_net);
+    }
     //学習を実行
+    int cnt=REPEAT_COUNT;
     for(i=0;i<REPEAT_COUNT2;i++){
-        for(j=0;j<REPEAT_COUNT;j++){
-#ifdef MULTI
-            n=rand()%4;
-            calc_gradient(W,B,&X[n],&T[n],dL);
+        for(j=0;j<size_teacher;j++){
+            calc_gradient(W,B,&X[j],&T[j],dL);
             for(k=0;k<size_net;k++){
                 *(pnet_value[k])-=RATE*dL[k];
             }
-#else
-            n=0;
-            calc_gradient(W,B,&X[n],&T[n],dL);
-            for(k=0;k<size_net;k++){
-                *(pnet_value[k])-=RATE*dL[k];
+        }
+        if(cnt<=1){
+            double ret=0;
+            for(j=0;j<size_teacher;j++){
+                two_layer_net(&X[j],&Y,W,B);
+                ret+=cross_entropy_error(&Y,&T[j]);
             }
-#endif               
+            fprintf(fp,"%lu  %lf\n",i,ret);
+            printf("\rprogress:%3.3f %%",((float)i/REPEAT_COUNT2)*100.0);
+            cnt=REPEAT_COUNT;
+        }else{
+            cnt--;
         }
-        ret=0;
-#ifdef MULTI
-        fprintf(fp,"%d  ",i);
-        for(n=0;n<4;n++){
-            two_layer_net(&X[n],&Y,W,B);
-            fprintf(fp,"%f  ",Y.elep[0]);
-            ret+=cross_entropy_error(&Y,&T[n]);   
-        }
-        fprintf(fp,"%f\n",ret);
-#else        
-        two_layer_net(&X[0],&Y,W,B);
-        ret=cross_entropy_error(&Y,&T[0]);
-        fprintf(fp,"%d  %f\n",i,ret);
-#endif   
+        
     }
     
+    update_network_data(pnet_value,size_net);
 
     //動的メモリの解放
     free(pnet_value);
@@ -127,10 +122,5 @@ void init(S_MATRIX* W,S_MATRIX* B,double **pnet_value){
             *(pnet_value+n)=B[i].elep+j;             
             n++;
         }
-    }
-
-    //ネットワーク変数の初期値をランダムに生成
-    for(i=0;i<n;i++){
-        *(pnet_value[i])=rand()%100/100.0;
     }
 }

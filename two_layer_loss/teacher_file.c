@@ -9,6 +9,62 @@
 #include "gradient.h"
 #include "teacher_file.h"
 
+/*teacher fileを初期化*/
+//引数  size_X  入力データサイズ
+//      size_T  出力データサイズ
+//戻り値 0:正常
+//      -1:ファイル異常
+int init_teacher_file(int size_X,int size_T){
+    FILE * fp;
+    fp=fopen(TEACHER_FILE_NAME,"w");
+    if(fp==NULL){
+        fclose(fp);
+        return -1;
+    }
+    fprintf(fp,"%d\n%d",size_X,size_T);
+    fclose(fp);
+    return 0;
+}
+/*teacher data setの基本情報を取得する*/
+//引数  int * size_teacher  データセット数を返すポインタ
+//      int * size_X    入力データサイズを返すポインタ
+//      int * size_T    出力データサイズを返すポインタ
+//戻り値    0 :正常
+//          -1:データセット数不正
+//          -2:ファイルエラー
+//          -3:そのほかエラー
+int get_teacher_file_info(int * size_teacher,int * size_X,int *size_T){
+    //NULL check
+    if(size_teacher==NULL || size_X==NULL || size_T==NULL){
+        return(-3);
+    }
+    //file open
+    FILE * fp;
+    fp=fopen(TEACHER_FILE_NAME,"r");
+    if(fp==NULL){
+        fclose(fp);
+        return -2;
+    }
+
+    //file info 取得
+    fscanf(fp,"%d",size_X);
+    fscanf(fp,"%d",size_T);
+
+    int line_size =(*size_teacher)*(*size_T)*(*size_X);
+    int line=0;
+    char buf[128];
+    while(fscanf(fp,"%s",buf)!=EOF){
+        line++;
+    }
+    *size_teacher=line/((*size_T)*(*size_X));
+        
+    //file正規性確認    
+    if(*size_teacher>MAX_SIZE_TEACHER){
+        printf("WARNING: in %s \n\tdata amount is %d, which over threshould\n",TEACHER_FILE_NAME,*size_teacher);
+    }
+    fclose(fp);
+    return 0;
+}
 
 /*教師データをデータファイルから読み込む*/
 //引数　size_X  入力パラメタ数
@@ -28,24 +84,23 @@ int read_teacher_data(int *size_X,int *size_T,S_MATRIX *X,S_MATRIX *T){
     if(size_X==NULL||size_T==NULL){
         return -2;
     }
+    
+    //read file info
+    get_teacher_file_info(&size_teacher,size_X,size_T);
+
     //File open
     fp=fopen(TEACHER_FILE_NAME,"r");
     if(fp==NULL){
         return -1;
     }
 
-    //read file
-    fscanf(fp,"%d",&size_teacher);
-    fscanf(fp,"%d",size_X);
-    fscanf(fp,"%d",size_T);
+    //skip header file
+    fscanf(fp,"%lf",&buf);
+    fscanf(fp,"%lf",&buf);
+
     if(&size_X==0||&size_T==0){
         fclose(fp);
         return -1;
-    }
-
-    //暫定的に入力サイズが閾値を超えた場合は読み込む教師データ数を制限するものとする
-    if(size_teacher>MAX_SIZE_TEACHER){
-        size_teacher=MAX_SIZE_TEACHER;
     }
     block_size= *size_T * *size_X;
 
@@ -114,7 +169,7 @@ int add_teacher_data(int size_X,int size_T,S_MATRIX X,S_MATRIX T){
     }
 
     //データセット数が閾値を超えていないか確認
-    if(size_teacher>MAX_SIZE_TEACHER){
+    if(size_teacher>=MAX_SIZE_TEACHER){
         printf("WARNING : data amount get over the threshould\n");
     }
 
@@ -132,71 +187,5 @@ int add_teacher_data(int size_X,int size_T,S_MATRIX X,S_MATRIX T){
     }
     fclose(fp);
 
-    //データセット数を更新
-    fp=fopen(TEACHER_FILE_NAME,"r+");
-    fprintf(fp,"%d",++size_teacher);
-    fclose(fp);
-
-    return 0;
-}
-/*teacher data setの基本情報を取得する*/
-//引数  int * size_teacher  データセット数を返すポインタ
-//      int * size_X    入力データサイズを返すポインタ
-//      int * size_T    出力データサイズを返すポインタ
-//戻り値    0 :正常
-//          -1:データセット数不正
-//          -2:ファイルエラー
-//          -3:そのほかエラー
-int get_teacher_file_info(int * size_teacher,int * size_X,int *size_T){
-    //NULL check
-    if(size_teacher==NULL || size_X==NULL || size_T==NULL){
-        return(-3);
-    }
-    //file open
-    FILE * fp;
-    fp=fopen(TEACHER_FILE_NAME,"r");
-    if(fp==NULL){
-        fclose(fp);
-        return -2;
-    }
-
-    //file info 取得
-    fscanf(fp,"%d",size_teacher);
-    fscanf(fp,"%d",size_X);
-    fscanf(fp,"%d",size_T);
-
-    //file正規性確認    
-    if(*size_teacher>MAX_SIZE_TEACHER){
-        printf("WARNING: in %s \n\tdata amount is %d, which over threshould\n",TEACHER_FILE_NAME,*size_teacher);
-    }
-    int line_size =(*size_teacher)*(*size_T)*(*size_X);
-    int line=0;
-    char buf[128];
-    while(fscanf(fp,"%s",buf)!=EOF){
-        line++;
-    }
-    if(line_size!=line){
-        printf("ERROR:%s\n",TEACHER_FILE_NAME);
-        printf("\t file statement is not match with the data \n");
-        fclose(fp);
-        return -1;
-    }
-    fclose(fp);
-    return 0;
-}
-/*teacher fileを初期化*/
-//引数  size_X  入力データサイズ
-//      size_T  出力データサイズ
-//戻り値 0:正常
-//      -1:ファイル異常
-int init_teacher_file(int size_X,int size_T){
-    FILE * fp;
-    fp=fopen(TEACHER_FILE_NAME,"w");
-    if(fp==NULL){
-        fclose(fp);
-        return -1;
-    }
-    fprintf(fp,"0\n%d\n%d",size_X,size_T);
-    fclose(fp);
     return 0;
 }

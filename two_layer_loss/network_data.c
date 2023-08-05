@@ -28,6 +28,10 @@ int net_data_amount(int layer_size,int *neuron_size,int input_size,int output_si
     for(int i=0;i<layer_size-1;i++){
         ret+=neuron_size[i]*neuron_size[i+1];
     }
+    ret+=output_size;
+    for(int i=0;i<layer_size;i++){
+        ret+=neuron_size[i];
+    }
     return ret;
 }
 
