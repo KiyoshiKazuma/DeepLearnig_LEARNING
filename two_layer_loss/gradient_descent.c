@@ -11,7 +11,7 @@
 #include "network_data.h"
 
 #define REPEAT_COUNT (10)
-#define REPEAT_COUNT2 (100)
+#define REPEAT_COUNT2 (1000)
 #define RATE (0.1)
 
 #define D_DEBUG
@@ -81,6 +81,7 @@ int main(void){
                 two_layer_net(&X[j],&Y,W,B);
                 ret+=cross_entropy_error(&Y,&T[j]);
             }
+            ret/=size_teacher;
             fprintf(fp,"%lu  %lf\n",i,ret);
             printf("\rprogress:%3.3f %%",((float)i/REPEAT_COUNT2)*100.0);
             cnt=REPEAT_COUNT;
