@@ -1,8 +1,6 @@
 #ifndef TEACHER_H
 #define TEACHER_H
 
-#define MAX_SIZE_TEACHER (1000)
-#define TEACHER_FILE_NAME "teacher.dat"
 
 #include"matrix.h"
 

@@ -8,6 +8,7 @@
 #include "loss_function.h"
 #include "gradient.h"
 #include "teacher_file.h"
+#include "configuration.h"
 
 /*teacher fileを初期化*/
 //引数  size_X  入力データサイズ
@@ -59,7 +60,7 @@ int get_teacher_file_info(int * size_teacher,int * size_X,int *size_T){
     *size_teacher=line/((*size_T)*(*size_X));
         
     //file正規性確認    
-    if(*size_teacher>MAX_SIZE_TEACHER){
+    if(*size_teacher>TEACHER_MAX_SIZE){
         printf("WARNING: in %s \n\tdata amount is %d, which over threshould\n",TEACHER_FILE_NAME,*size_teacher);
     }
     fclose(fp);
@@ -169,7 +170,7 @@ int add_teacher_data(int size_X,int size_T,S_MATRIX X,S_MATRIX T){
     }
 
     //データセット数が閾値を超えていないか確認
-    if(size_teacher>=MAX_SIZE_TEACHER){
+    if(size_teacher>=TEACHER_MAX_SIZE){
         printf("WARNING : data amount get over the threshould\n");
     }
 

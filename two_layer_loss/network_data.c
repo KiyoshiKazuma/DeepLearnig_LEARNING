@@ -9,6 +9,7 @@
 #include "gradient.h"
 #include "teacher_file.h"
 #include "network_data.h"
+#include "configuration.h"
 
 /*ネットワークのデータ総数を求めて返す*/
 //引数  int layer_size ネットワークの総数
@@ -65,7 +66,7 @@ int init_network_data(int layer_size,int *neuron_size){
 //戻り値    正値:ネットワークのサイズ
 //          -1:ファイル異常
 //          -2:そのほか異常
-int get_network_info(int *layer_size,int *neuron_size){
+int get_network_info(int *layer_size,int *hiden_size){
     FILE * fp;
     fp=fopen(NEURON_FILE_NAME,"r");
     if(fp==NULL){
@@ -76,9 +77,9 @@ int get_network_info(int *layer_size,int *neuron_size){
         fclose(fp);
         return -1;
     }
-    if(*layer_size>MAX_LAYER_NETWORK){
+    if(*layer_size>NETWORK_MAX_LAYER){
         printf("WARNING : %s\n",NEURON_FILE_NAME);
-        printf("\tlayer size in file is over the threshould :%d / %d\n",*layer_size,MAX_LAYER_NETWORK);
+        printf("\tlayer size in file is over the threshould :%d / %d\n",*layer_size,NETWORK_MAX_LAYER);
     }
     for(int i=0;i<*layer_size;i++){
         int tmp;
@@ -88,7 +89,7 @@ int get_network_info(int *layer_size,int *neuron_size){
             fclose(fp);
             return -1;
         }
-        neuron_size[i]=tmp;
+        hiden_size[i]=tmp;
     }
     fclose(fp);
     return 0;
@@ -102,7 +103,7 @@ int get_network_info(int *layer_size,int *neuron_size){
 int read_network_data(double **pnet_value,int net_amount){
     double buf;
     int layer_size,i;
-    int neuron_size[MAX_LAYER_NETWORK];
+    int neuron_size[NETWORK_MAX_LAYER];
     int ret;
     int datasize;
 
@@ -144,7 +145,7 @@ int read_network_data(double **pnet_value,int net_amount){
 int update_network_data(double **pnet_value,int net_amount){
     double buf;
     int layer_size,i;
-    int neuron_size[MAX_LAYER_NETWORK];
+    int neuron_size[NETWORK_MAX_LAYER];
     int ret;
     int datasize;
 

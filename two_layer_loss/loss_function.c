@@ -4,6 +4,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <math.h>
+#include "configuration.h"
 
 
 double mean_squared_error(S_MATRIX* Y,S_MATRIX* T){
