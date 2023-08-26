@@ -11,55 +11,52 @@
 #include "network_data.h"
 #include "configuration.h"
 
-#define REPEAT_COUNT (10)
-#define REPEAT_COUNT2 (1000)
 #define RATE (0.1)
-
-#define D_DEBUG
-#define MULTI
+//#define D_DEBUG
+//#define MULTI
 
 
 //勾配降下法
-//概要：1エポックの学習データに対し、勾配降下法を持ちいてネットワーク変数を更新する。
+//概要：1つのデータに対する学習を行う
 //引数  S_MATRIX *W :ネットワーク変数へのポインタ
 //      S_MATRIX *B :ネットワーク変数へのポインタ
-//      S_MATRIX *X :教師データ入力ベクトル(1エポック)
-//      S_MATRIX *T :教師データ出力ベクトル(１エポック)
+//      S_MATRIX *X :教師データ入力ベクトル
+//      S_MATRIX *T :教師データ出力ベクトル
+//      int     learning_size :学習を実行するデータの数
 //戻り値     0:正常終了
 //          -1:ポインタエラー
 //          -2:ファイルエラー
 //          -3:そのほかエラー
-int gradient_descent(S_MATRIX *W,S_MATRIX *B,S_MATRIX* X,S_MATRIX *T){
+int gradient_descent(S_MATRIX *W,S_MATRIX *B,S_MATRIX* X,S_MATRIX *T,int learning_size){
     //NULL CHECK
     if(W==NULL || B==NULL || X==NULL ||T==NULL){
         return -1;
     }
 
-    //学習用パラメータをセット
-    int size_input,size_output;
-    S_MATRIX Y;
-    F_CREATE_MATRIX(1,size_output,&Y);
-    int size_net=calc_size_net(W,B);    
+    int size_net=calc_size_net(W,B);
     double **pnet_value=malloc(sizeof(double)*size_net);
     double * dL = malloc(sizeof(double)*size_net);
     double * rate=malloc(sizeof(double)*size_net);
 
-    init(W,B,pnet_value);
+    aggregate_network_data(W,B,pnet_value);
+    //重み変数を計算
+    for(int i=0;i<size_net;i++){
+        rate[i]=1.0;
+    }
 
     //学習を実行
-    for(int i=0;i<EPOCH_SIZE;i++){
+    for(int i=0;i<learning_size;i++){
         calc_gradient(W,B,&X[i],&T[i],dL);
         for(int k=0;k<size_net;k++){
-            *(pnet_value[k])-=RATE*dL[k];
-        }        
+            *(pnet_value[k])-=RATE*rate[k]*dL[k];
+        }
     }
-    
+
     //動的メモリの解放
     free(pnet_value);
     free(dL);
     free(rate);
-    F_DELETE_MATRIX(&Y);
-
+  
     return 0;
 }
 

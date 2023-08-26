@@ -16,6 +16,7 @@
 #define MULTI
 
 int main(void){
+    //変数宣言
     srand((unsigned int)time(NULL));
     int input_size,output_size;
     int hiden_size[NETWORK_MAX_LAYER];
@@ -42,24 +43,22 @@ int main(void){
         printf("ERROR occor in \"read_teacher_data\"\n");
         printf("error code %d\n",teacher_size);
     }
-    for(int i=0;i<teacher_size;i++){
-        
-    }
 
     //ネットワーク変数データを読み込む
     network_size=get_network_info(&layer_size,&hiden_size);
-
     ret=read_network_data(pnet_value,network_size);
 
     //学習用パラメータをセット
-
+    for(int i=0;i<layer_size;i++){
+        F_CREATE_MATRIX(network_size[i],network_size[i+1],W[i]);
+    }
 
 
     int size_net=calc_size_net(W,B);    
     double **pnet_value=malloc(sizeof(double)*size_net);
     double * dL = malloc(sizeof(double)*size_net);
 
-    init(W,B,pnet_value);
+    aggregate_network_data(W,B,pnet_value);
 
     //ネットワーク変数の初期値をランダムに生成
     //OR
@@ -68,37 +67,17 @@ int main(void){
     char cmd;
     scanf("%c",&cmd);
     if(cmd=='y'){
-        for(i=0;i<size_net;i++){
+        for(int i=0;i<size_net;i++){
             *(pnet_value[i])=rand()%100/100.0;
         }
     }else{
         read_network_data(pnet_value,size_net);
     }
+
     //学習を実行
-    int cnt=REPEAT_COUNT;
-    for(i=0;i<REPEAT_COUNT2;i++){
-        for(j=0;j<size_teacher;j++){
-            calc_gradient(W,B,&X[j],&T[j],dL);
-            for(k=0;k<size_net;k++){
-                *(pnet_value[k])-=RATE*dL[k];
-            }
-        }
-        if(cnt<=1){
-            double ret=0;
-            for(j=0;j<size_teacher;j++){
-                two_layer_net(&X[j],&Y,W,B);
-                ret+=cross_entropy_error(&Y,&T[j]);
-            }
-            ret/=size_teacher;
-            fprintf(fp,"%lu  %lf\n",i,ret);
-            printf("\rprogress:%3.3f %%",((float)i/REPEAT_COUNT2)*100.0);
-            cnt=REPEAT_COUNT;
-        }else{
-            cnt--;
-        }
-        
-    }
     
+
+    //学習データをファイルに記録
     update_network_data(pnet_value,size_net);
 
     //動的メモリの解放
@@ -115,21 +94,3 @@ int main(void){
 }
 
 
-void init(S_MATRIX* W,S_MATRIX* B,double **pnet_value){
-    int i,j,n;
-
-    //ネットワークの変数W,Bの各要素へのポインタの配列を作成。
-    n=0;
-    for(i=0;i<2;i++){
-        for(j=0;j<SIZE(W[i]);j++){
-            *(pnet_value+n)=W[i].elep+j;
-            n++;
-        }
-    }
-    for(i=0;i<2;i++){
-        for(j=0;j<SIZE(B[i]);j++){
-            *(pnet_value+n)=B[i].elep+j;             
-            n++;
-        }
-    }
-}

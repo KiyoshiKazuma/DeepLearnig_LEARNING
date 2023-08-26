@@ -4,6 +4,7 @@
 #include<math.h>
 #include"matrix.h"
 #include"two_layer_net.h"
+#include "configuration.h"
 
 double sigmoid(double x);
 
