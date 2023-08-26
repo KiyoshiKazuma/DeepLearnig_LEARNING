@@ -12,6 +12,7 @@
 #include "configuration.h"
 #include "gradient_descent.h"
 
+#define REPEAT_MAX (1000)
 #define D_DEBUG
 #define MULTI
 
@@ -53,7 +54,6 @@ int main(void){
         F_CREATE_MATRIX(network_size[i],network_size[i+1],W[i]);
     }
 
-
     int size_net=calc_size_net(W,B);    
     double **pnet_value=malloc(sizeof(double)*size_net);
     double * dL = malloc(sizeof(double)*size_net);
@@ -74,7 +74,24 @@ int main(void){
         read_network_data(pnet_value,size_net);
     }
 
-    //学習を実行
+    for(int i=0;i<REPEAT_MAX;i++){
+        //学習データを生成
+        ret=pick_random_teacher_dataset(X,T,X_epoch,T_epoch,teacher_size,EPOCH_SIZE);
+        if(ret!=0){
+            printf("ERROR ###deep_learning.c###\n\terror in \'pick_random_teacher_dataset\'\n");
+            return 0;
+        }
+        //testデータを生成
+
+        //学習を実行
+
+        //testを実行
+
+        //test結果をログファイルに出力
+
+        //終了条件を判定
+
+    }
     
 
     //学習データをファイルに記録
@@ -94,3 +111,45 @@ int main(void){
 }
 
 
+/*関数　pick_random_teacher_dataset*/
+/*概要　教師データセットから指定数のデータセットをランダムに抽出する*/
+/*引数  教師データセット入力    S_MATRIX * X*/
+/*      教師データセット正解    S_MATRIX * T*/
+/*      抽出データセット入力    S_MATRIX * X_out*/
+/*      抽出データセット正解     S_MATRIX * T_out*/
+/*      教師データ数            int size_teacher*/
+/*      抽出数                  int size_out */
+/*戻り値     0  正常終了*/
+/*          -1  ポインタエラー*/
+/*          -2そのほかエラー*/
+int pick_random_teacher_dataset(S_MATRIX * X,S_MATRIX * T,S_MATRIX *X_out,S_MATRIX * T_out,int size_teacher,int size_out){
+    //NULL CHECK
+    if(X==NULL || T==NULL || X_out==NULL || T_out==NULL){
+        return -1;
+    }
+    if(size_teacher<size_out){
+        printf("ERROR ###pick_random_teacher_dataset###\n\tinput error : size_out is larger than size_teacher\n");
+        return -2;
+    }
+
+    int data_arrow[size_teacher];
+    int data_arrow_out[size_out];
+    for(int i=0;i<size_teacher;i++){
+        data_arrow[i]=i;
+    }
+
+    for(int i=0;i<size_out;i++){
+        int rnd=rand()%(size_teacher-i);
+        data_arrow_out[i]=data_arrow[rnd];
+        for(int j=rnd;j<size_teacher-i-1;j++){
+            data_arrow[j]=data_arrow[j+1];
+        }
+    }
+
+    for(int i=0;i<size_out;i++){
+        X_out[data_arrow_out[i]]=X[data_arrow_out[i]];
+        T_out[data_arrow_out[i]]=T[data_arrow_out[i]];
+    }
+
+    return 0;
+}
