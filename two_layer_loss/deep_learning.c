@@ -13,8 +13,11 @@
 #include "gradient_descent.h"
 
 #define REPEAT_MAX (1000)
+#define THRESHOULD (0.001)
 #define D_DEBUG
 #define MULTI
+
+int pick_random_teacher_dataset(S_MATRIX * X,S_MATRIX * T,S_MATRIX *X_out,S_MATRIX * T_out,int size_teacher,int size_out);
 
 int main(void){
     //変数宣言
@@ -52,7 +55,21 @@ int main(void){
     //学習用パラメータをセット
     for(int i=0;i<layer_size;i++){
         F_CREATE_MATRIX(network_size[i],network_size[i+1],W[i]);
+        F_CREATE_MATRIX(1,network_size[i])
     }
+    for(int i=0;i<teacher_size;i++){
+        F_CREATE_MATRIX(1,input_size,&X[i]);
+        F_CREATE_MATRIX(1,output_size,&T[i]);
+    }
+    for(int i=0;i<EPOCH_SIZE;i++){
+        F_CREATE_MATRIX(1,input_size,&X_epoch[i]);
+        F_CREATE_MATRIX(1,output_size,&T_epoch[i]);
+    }
+    for(int i=0;i<TEST_SIZE;i++){
+        F_CREATE_MATRIX(1,input_size,&X_test[i]);
+        F_CREATE_MATRIX(1,output_size,&T_test[i]);
+    }
+    F_CREATE_MATRIX(1,HIDEN_SIZE,Y);
 
     int size_net=calc_size_net(W,B);    
     double **pnet_value=malloc(sizeof(double)*size_net);
@@ -79,18 +96,37 @@ int main(void){
         ret=pick_random_teacher_dataset(X,T,X_epoch,T_epoch,teacher_size,EPOCH_SIZE);
         if(ret!=0){
             printf("ERROR ###deep_learning.c###\n\terror in \'pick_random_teacher_dataset\'\n");
-            return 0;
+            break;
         }
         //testデータを生成
-
+        ret=pick_random_teacher_dataset(X,T,X_test,T_test,teacher_size,TEST_SIZE);
+        if(ret!=0){
+            printf("ERROR ###deep_learning.c###\n\terror in \'pick_random_teacher_dataset\'\n");
+            break;
+        }
         //学習を実行
+        ret=gradient_descent(W,B,X_epoch,T_epoch,EPOCH_SIZE);
+        if(ret!=0){
+            printf("ERROR ###deep_learning.c###\n\terror in \'gradient_descent\'\n");
+            break;
+        }
 
         //testを実行
+        double error=0;
+        for(int j=0;j<TEST_SIZE;j++){
+            two_layer_net(&X_test[j],&Y,W,B);
+            error+=cross_entropy_error(&Y,&T[T_test]);
+        }
+        error/=TEST_SIZE;
 
         //test結果をログファイルに出力
+        fprintf(fp,"%d,%lf\n",i,error);
 
         //終了条件を判定
-
+        if(error<THRESHOULD){
+            printf("END LEARNING\n");
+            break;
+        }
     }
     
 
