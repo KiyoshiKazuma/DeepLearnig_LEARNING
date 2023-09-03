@@ -10,6 +10,7 @@
 #include "teacher_file.h"
 #include "network_data.h"
 #include "configuration.h"
+#include "gradient_descent.h"
 
 #define RATE (0.1)
 //#define D_DEBUG

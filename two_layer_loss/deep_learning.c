@@ -11,11 +11,14 @@
 #include "network_data.h"
 #include "configuration.h"
 #include "gradient_descent.h"
+#include "configuration.h"
 
 #define REPEAT_MAX (1000)
 #define THRESHOULD (0.001)
 #define D_DEBUG
 #define MULTI
+
+S_NETWORK_INFO g_network_info;
 
 int pick_random_teacher_dataset(S_MATRIX * X,S_MATRIX * T,S_MATRIX *X_out,S_MATRIX * T_out,int size_teacher,int size_out);
 
@@ -23,12 +26,11 @@ int main(void){
     //変数宣言
     srand((unsigned int)time(NULL));
     int input_size,output_size;
-    int hiden_size[NETWORK_MAX_LAYER];
+    int neurons_size[NETWORK_MAX_LAYER];
     int teacher_size;
     int layer_size;
     int ret;
-    int network_size;
-    double ** pnet_value;
+    int net_amount;
     FILE * fp;
     fp=fopen("data.dat","w");
     S_MATRIX W[NETWORK_MAX_LAYER];
@@ -42,20 +44,34 @@ int main(void){
     S_MATRIX Y;
     
     //教師データを読み込む
-    teacher_size=read_teacher_data(&input_size,&output_size,X,T);
+    g_network_info.teacher_size=read_teacher_data(&input_size,&output_size,X,T);
     if(teacher_size<0){
         printf("ERROR occor in \"read_teacher_data\"\n");
         printf("error code %d\n",teacher_size);
     }
 
-    //ネットワーク変数データを読み込む
-    network_size=get_network_info(&layer_size,&hiden_size);
-    ret=read_network_data(pnet_value,network_size);
+    //ネットワークの構成を取得
+    ret=get_network_info(&layer_size,neurons_size);
+    if(ret!=0){
+        ;
+    }
+    net_amount=net_data_amount(layer_size,neurons_size);
+
+    //教師データとネットワークデータの整合性を確認
+    if(input_size!=neurons_size[0]||output_size!=neurons_size[layer_size]){
+        printf("ERROR###main###\n\tnetwork information is defference between teacher_data and network_data\n");
+        return 1;
+    }
+    if(input_size<2||output_size<2||layer_size<2){
+        printf("WARNING ###main###\n\tnetwork size is too small\n");
+    }
 
     //学習用パラメータをセット
-    for(int i=0;i<layer_size;i++){
-        F_CREATE_MATRIX(network_size[i],network_size[i+1],W[i]);
-        F_CREATE_MATRIX(1,network_size[i])
+    for(int i=0;i<layer_size-1;i++){
+        F_CREATE_MATRIX(neurons_size[i],neurons_size[i+1],&W[i]);
+    }
+    for(int i=0;i<layer_size-1;i++){
+        F_CREATE_MATRIX(1,neurons_size[i+1],&B[i]);
     }
     for(int i=0;i<teacher_size;i++){
         F_CREATE_MATRIX(1,input_size,&X[i]);
@@ -69,11 +85,10 @@ int main(void){
         F_CREATE_MATRIX(1,input_size,&X_test[i]);
         F_CREATE_MATRIX(1,output_size,&T_test[i]);
     }
-    F_CREATE_MATRIX(1,HIDEN_SIZE,Y);
+    F_CREATE_MATRIX(1,output_size,&Y);
 
-    int size_net=calc_size_net(W,B);    
-    double **pnet_value=malloc(sizeof(double)*size_net);
-    double * dL = malloc(sizeof(double)*size_net);
+    double **pnet_value=malloc(sizeof(double)*net_amount);
+    double *dL = malloc(sizeof(double)*net_amount);
 
     aggregate_network_data(W,B,pnet_value);
 
@@ -84,13 +99,14 @@ int main(void){
     char cmd;
     scanf("%c",&cmd);
     if(cmd=='y'){
-        for(int i=0;i<size_net;i++){
+        for(int i=0;i<net_amount;i++){
             *(pnet_value[i])=rand()%100/100.0;
         }
     }else{
-        read_network_data(pnet_value,size_net);
+        read_network_data(pnet_value,net_amount);
     }
 
+    /***ミニバッチで学習を実行***/
     for(int i=0;i<REPEAT_MAX;i++){
         //学習データを生成
         ret=pick_random_teacher_dataset(X,T,X_epoch,T_epoch,teacher_size,EPOCH_SIZE);
@@ -115,7 +131,7 @@ int main(void){
         double error=0;
         for(int j=0;j<TEST_SIZE;j++){
             two_layer_net(&X_test[j],&Y,W,B);
-            error+=cross_entropy_error(&Y,&T[T_test]);
+            error+=cross_entropy_error(&Y,&T_test[j]);
         }
         error/=TEST_SIZE;
 
@@ -131,7 +147,7 @@ int main(void){
     
 
     //学習データをファイルに記録
-    update_network_data(pnet_value,size_net);
+    update_network_data(pnet_value,net_amount);
 
     //動的メモリの解放
     free(pnet_value);

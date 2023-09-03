@@ -14,29 +14,22 @@
 /*ネットワークのデータ総数を求めて返す*/
 //引数  int layer_size ネットワークの総数
 //      int *neuron_size 各層のニューロン数
-//      int input_size 入力層のパラメータ数
-//      int output_size 出力層のパラメータ数
 //戻り値 正数:データ総数
 //      -1:エラー
-int net_data_amount(int layer_size,int *neuron_size,int input_size,int output_size){
+int net_data_amount(int layer_size,int *neurons_size){
     //NULL check
-    if(neuron_size==NULL){
+    if(neurons_size==NULL){
         return -1;
     }
     int ret=0;
-    ret+=input_size*neuron_size[0];
-    ret+=output_size*neuron_size[layer_size-1];
     for(int i=0;i<layer_size-1;i++){
-        ret+=neuron_size[i]*neuron_size[i+1];
+        ret+=neurons_size[i]*neurons_size[i+1];
     }
-    ret+=output_size;
-    for(int i=0;i<layer_size;i++){
-        ret+=neuron_size[i];
+    for(int i=0;i<layer_size-1;i++){
+        ret+=neurons_size[i+1];
     }
     return ret;
 }
-
-
 
 
 /*ネットワークファイルを初期化する*/
@@ -44,12 +37,17 @@ int net_data_amount(int layer_size,int *neuron_size,int input_size,int output_si
 //      int *neuron_size 各層のニューロン数
 //戻り値　   0:正常
 //          -1:ファイル異常
+//          -2:引数エラー
 int init_network_data(int layer_size,int *neuron_size){
     //ファイルを開く
     FILE * fp;
     fp=fopen(NEURON_FILE_NAME,"w");
     if(fp==NULL){
         return -1;
+    }
+    if(layer_size<2){
+        printf("ERROR###init_network_data###\n\tlayer size must be more than 2\n");
+        return -2;
     }
 
     fprintf(fp,"%d\n",layer_size);
@@ -66,14 +64,14 @@ int init_network_data(int layer_size,int *neuron_size){
 //戻り値    正値:ネットワークのサイズ
 //          -1:ファイル異常
 //          -2:そのほか異常
-int get_network_info(int *layer_size,int *hiden_size){
+int get_network_info(int *layer_size,int *neurons_size){
     FILE * fp;
     fp=fopen(NEURON_FILE_NAME,"r");
     if(fp==NULL){
         return -1;
     }
     fscanf(fp,"%d",layer_size);
-    if(*layer_size<=0){
+    if(*layer_size<2){
         fclose(fp);
         return -1;
     }
@@ -89,7 +87,7 @@ int get_network_info(int *layer_size,int *hiden_size){
             fclose(fp);
             return -1;
         }
-        hiden_size[i]=tmp;
+        neurons_size[i]=tmp;
     }
     fclose(fp);
     return 0;
@@ -97,6 +95,7 @@ int get_network_info(int *layer_size,int *hiden_size){
 
 /*ネットワークファイルからデータを読み込む*/
 //引数  double **pnet_value データの中身への配列へのポインタ
+//      int net_amount      ネットワーク変数の変数数
 //戻り値     0:正常
 //          -1:ファイル異常
 //          -2:そのほか異常
@@ -139,6 +138,7 @@ int read_network_data(double **pnet_value,int net_amount){
 
 /*ネットワークファイルのデータを更新する*/
 //引数  double **pnet_value データの中身への配列へのポインタ
+//      int     net_amount  ネットワーク変数の変数数
 //戻り値     0:正常
 //          -1:ファイル異常
 //          -2:そのほか異常

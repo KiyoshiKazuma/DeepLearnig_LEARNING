@@ -6,7 +6,7 @@
 #include "two_layer_net.h"
 #include "loss_function.h"
 #include "gradient.h"
-
+#include "gradient_descent.h"
 #define DH (0.1)
 
 int calc_gradient(S_MATRIX* W,S_MATRIX* B,S_MATRIX* X, S_MATRIX* T,double * ret){

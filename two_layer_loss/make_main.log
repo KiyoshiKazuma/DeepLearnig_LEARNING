@@ -1,0 +1,60 @@
+In file included from deep_learning.c:12:
+configuration.h:3:10: error: #include expects "FILENAME" or <FILENAME>
+    3 | #include matrix.h
+      |          ^~~~~~
+configuration.h:6:8: error: unknown type name 'S_NETWORK_INFO'
+    6 | extern S_NETWORK_INFO g_network_info;
+      |        ^~~~~~~~~~~~~~
+deep_learning.c:21:16: error: conflicting types for 'g_network_info'
+   21 | S_NETWORK_INFO g_network_info;
+      |                ^~~~~~~~~~~~~~
+In file included from deep_learning.c:12:
+configuration.h:6:23: note: previous declaration of 'g_network_info' was here
+    6 | extern S_NETWORK_INFO g_network_info;
+      |                       ^~~~~~~~~~~~~~
+In file included from gradient_descent.c:12:
+configuration.h:3:10: error: #include expects "FILENAME" or <FILENAME>
+    3 | #include matrix.h
+      |          ^~~~~~
+configuration.h:6:8: error: unknown type name 'S_NETWORK_INFO'
+    6 | extern S_NETWORK_INFO g_network_info;
+      |        ^~~~~~~~~~~~~~
+gradient.c: In function 'calc_gradient':
+gradient.c:18:21: error: 'INPUT_SIZE' undeclared (first use in this function)
+   18 |     F_CREATE_MATRIX(INPUT_SIZE,HIDEN_SIZE,&Wtmp[0]);
+      |                     ^~~~~~~~~~
+gradient.c:18:21: note: each undeclared identifier is reported only once for each function it appears in
+gradient.c:18:32: error: 'HIDEN_SIZE' undeclared (first use in this function)
+   18 |     F_CREATE_MATRIX(INPUT_SIZE,HIDEN_SIZE,&Wtmp[0]);
+      |                                ^~~~~~~~~~
+gradient.c:19:32: error: 'OUTPUT_SIZE' undeclared (first use in this function)
+   19 |     F_CREATE_MATRIX(HIDEN_SIZE,OUTPUT_SIZE,&Wtmp[1]);
+      |                                ^~~~~~~~~~~
+In file included from loss_function.c:7:
+configuration.h:3:10: error: #include expects "FILENAME" or <FILENAME>
+    3 | #include matrix.h
+      |          ^~~~~~
+configuration.h:6:8: error: unknown type name 'S_NETWORK_INFO'
+    6 | extern S_NETWORK_INFO g_network_info;
+      |        ^~~~~~~~~~~~~~
+In file included from two_layer_net.c:7:
+configuration.h:3:10: error: #include expects "FILENAME" or <FILENAME>
+    3 | #include matrix.h
+      |          ^~~~~~
+configuration.h:6:8: error: unknown type name 'S_NETWORK_INFO'
+    6 | extern S_NETWORK_INFO g_network_info;
+      |        ^~~~~~~~~~~~~~
+In file included from teacher_file.c:11:
+configuration.h:3:10: error: #include expects "FILENAME" or <FILENAME>
+    3 | #include matrix.h
+      |          ^~~~~~
+configuration.h:6:8: error: unknown type name 'S_NETWORK_INFO'
+    6 | extern S_NETWORK_INFO g_network_info;
+      |        ^~~~~~~~~~~~~~
+In file included from network_data.c:12:
+configuration.h:3:10: error: #include expects "FILENAME" or <FILENAME>
+    3 | #include matrix.h
+      |          ^~~~~~
+configuration.h:6:8: error: unknown type name 'S_NETWORK_INFO'
+    6 | extern S_NETWORK_INFO g_network_info;
+      |        ^~~~~~~~~~~~~~
