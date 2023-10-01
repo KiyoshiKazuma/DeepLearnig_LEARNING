@@ -1,0 +1,18 @@
+ABSTRUCT
+ Execute simple deeplearning program.
+ >create and load "teacher data set"
+ >save and load network parameters.
+ >use "mini patch" algolism.
+
+FILES
+ >deep_learning.c       :   main関数 学習データ、ネットワークパラメータのload/save ミニバッチ処理の実行
+ >configuration.h       :   コンフィグファイル
+ >gradient_descant.c    :   ネットワーク変数空間の損失を最小化するように最速降下法を用いて学習を進める
+ >gradient.c            :   ネットワーク変数空間の損失の勾配を求める
+ >two_layer_net.c       :   ニューラルネットワークの入力数列に対する出力数列を求める。
+ >loss_function.c       :   損失関数
+ >matrix.c              :   行列同士の計算や、行列の生成、削除を行う
+ >network_data.c        :   ネットワーク変数の生成、更新、読み込みを行う
+ >teacher_data.c        :   教師データの読み込み、書き込みを行う
+ >create_teacher_data.c :   教師データの生成を行う
+ >make.bat              :   実行ファイルを生成する
