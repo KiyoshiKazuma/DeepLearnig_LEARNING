@@ -1,9 +1,8 @@
 #ifndef H_CONFIG
 #define H_CONFIG
-#include matrix.h
+#include "matrix.h"
 //諸々変数を設定する。
 
-extern S_NETWORK_INFO g_network_info;
 
 #define NETWORK_MAX_LAYER (100) //ネットワーク層数の最大値
 #define TEACHER_MAX_SIZE (1000) //学習データセットの最大数
@@ -21,8 +20,6 @@ typedef struct{
     int layer_size;//ニューラルネットワークの層数
     int neurons_size[NETWORK_MAX_LAYER];//各層のパラメタ数
     int teacher_size;//教師データの層数
-    S_MATRIX * W;
-    S_MATRIX * B;
-    double ** pnet_valuee;
-}S_NETWORK_INFO;
+    int net_amount;
+}S_NETWORK;
 #endif
