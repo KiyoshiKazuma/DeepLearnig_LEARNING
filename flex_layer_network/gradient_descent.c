@@ -4,7 +4,7 @@
 #include <math.h>
 #include <time.h>
 #include "matrix.h"
-#include "two_layer_net.h"
+#include "neural_network.h"
 #include "loss_function.h"
 #include "gradient.h"
 #include "teacher_file.h"
@@ -28,27 +28,21 @@
 //          -1:ポインタエラー
 //          -2:ファイルエラー
 //          -3:そのほかエラー
-int gradient_descent(S_MATRIX *W,S_MATRIX *B,S_MATRIX* X,S_MATRIX *T,int learning_size){
-    //NULL CHECK
-    if(W==NULL || B==NULL || X==NULL ||T==NULL){
-        return -1;
-    }
+int gradient_descent(S_NETWORK net,S_MATRIX *vX,S_MATRIX *vT, S_MATRIX * vW,S_MATRIX * vB,int learning_size){
+    double **pnet_value=malloc(sizeof(double)*net.net_amount);
+    double * dL = malloc(sizeof(double)*net.net_amount);
+    double * rate=malloc(sizeof(double)*net.net_amount);
 
-    int size_net=calc_size_net(W,B);
-    double **pnet_value=malloc(sizeof(double)*size_net);
-    double * dL = malloc(sizeof(double)*size_net);
-    double * rate=malloc(sizeof(double)*size_net);
-
-    aggregate_network_data(W,B,pnet_value);
+    aggregate_network_data(net,vW,vB,pnet_value);
     //重み変数を計算
-    for(int i=0;i<size_net;i++){
+    for(int i=0;i<net.net_amount;i++){
         rate[i]=1.0;
     }
 
     //学習を実行
     for(int i=0;i<learning_size;i++){
-        calc_gradient(W,B,&X[i],&T[i],dL);
-        for(int k=0;k<size_net;k++){
+        calc_gradient(net,vX[i],vT[i],vW,vB,dL);
+        for(int k=0;k<net.net_amount;k++){
             *(pnet_value[k])-=RATE*rate[k]*dL[k];
         }
     }
@@ -70,25 +64,20 @@ int gradient_descent(S_MATRIX *W,S_MATRIX *B,S_MATRIX* X,S_MATRIX *T,int learnin
 //          -1:ポインタエラー
 //          -2:ファイルエラー
 //          -3:そのほかエラー
-int aggregate_network_data(S_MATRIX* W,S_MATRIX* B,double **pnet_value){
-    //NULL CHECK
-    if(W==NULL || B==NULL){
-        return -1;
-    }
-
+int aggregate_network_data(S_NETWORK net,S_MATRIX* vW,S_MATRIX* vB,double **pnet_value){
     int i,j,n;
 
     //ネットワークの変数W,Bの各要素へのポインタの配列を作成。
     n=0;
-    for(i=0;i<2;i++){
-        for(j=0;j<SIZE(W[i]);j++){
-            *(pnet_value+n)=W[i].elep+j;
+    for(i=0;i<net.layer_size-1;i++){
+        for(j=0;j<SIZE(vW[i]);j++){
+            *(pnet_value+n)=vW[i].elep+j;
             n++;
         }
     }
-    for(i=0;i<2;i++){
-        for(j=0;j<SIZE(B[i]);j++){
-            *(pnet_value+n)=B[i].elep+j;             
+    for(i=0;i<net.layer_size-1;i++){
+        for(j=0;j<SIZE(vB[i]);j++){
+            *(pnet_value+n)=vB[i].elep+j;             
             n++;
         }
     }

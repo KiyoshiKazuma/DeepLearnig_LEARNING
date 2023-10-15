@@ -1,0 +1,12 @@
+#flex_layer_network
+addapt program in "flex_layer_network" dir to the structure design in google drive.
+---fix list---
++neural_network.c/h
++loss_function.c/h
++gradient.c/h
+-gradient_descent.c/h
+-network_data.c/h
+-teacher_file.c/h
+-deep_learning.c/h
+
+* '+':Completed  '-':no Completed

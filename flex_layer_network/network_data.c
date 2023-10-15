@@ -12,47 +12,45 @@
 #include "configuration.h"
 
 /*ネットワークのデータ総数を求めて返す*/
-//引数  int layer_size ネットワークの総数
-//      int *neuron_size 各層のニューロン数
+//引数  S_NETWORK * pnet
 //戻り値 正数:データ総数
 //      -1:エラー
-int net_data_amount(int layer_size,int *neurons_size){
+int net_data_amount(S_NETWORK * pnet){
     //NULL check
-    if(neurons_size==NULL){
+    if(pnet==NULL){
         return -1;
     }
     int ret=0;
-    for(int i=0;i<layer_size-1;i++){
-        ret+=neurons_size[i]*neurons_size[i+1];
+    for(int i=0;i<pnet->layer_size-1;i++){
+        ret+=pnet->neurons_size[i]*pnet->neurons_size[i+1];
     }
-    for(int i=0;i<layer_size-1;i++){
-        ret+=neurons_size[i+1];
+    for(int i=0;i<pnet->layer_size-1;i++){
+        ret+=pnet->neurons_size[i+1];
     }
     return ret;
 }
 
 
 /*ネットワークファイルを初期化する*/
-//引数  int layer_size  ネットワークの層数
-//      int *neuron_size 各層のニューロン数
+//引数  S_NETWORK net
 //戻り値　   0:正常
 //          -1:ファイル異常
 //          -2:引数エラー
-int init_network_data(int layer_size,int *neuron_size){
+int init_network_data(S_NETWORK net){
     //ファイルを開く
     FILE * fp;
     fp=fopen(NEURON_FILE_NAME,"w");
     if(fp==NULL){
         return -1;
     }
-    if(layer_size<2){
+    if(net.layer_size<2){
         printf("ERROR###init_network_data###\n\tlayer size must be more than 2\n");
         return -2;
     }
 
-    fprintf(fp,"%d\n",layer_size);
-    for(int i=0;i<layer_size;i++){
-        fprintf(fp,"%d\n",neuron_size[i]);
+    fprintf(fp,"%d\n",net.layer_size);
+    for(int i=0;i<net.layer_size;i++){
+        fprintf(fp,"%d\n",net.neuron_size[i]);
     }
     fclose(fp);
     return 0;
