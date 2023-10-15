@@ -4,10 +4,6 @@
 #include <math.h>
 #include <time.h>
 #include "matrix.h"
-#include "two_layer_net.h"
-#include "loss_function.h"
-#include "gradient.h"
-#include "teacher_file.h"
 #include "network_data.h"
 #include "configuration.h"
 
@@ -50,7 +46,7 @@ int init_network_data(S_NETWORK net){
 
     fprintf(fp,"%d\n",net.layer_size);
     for(int i=0;i<net.layer_size;i++){
-        fprintf(fp,"%d\n",net.neuron_size[i]);
+        fprintf(fp,"%d\n",net.neurons_size[i]);
     }
     fclose(fp);
     return 0;
@@ -62,22 +58,22 @@ int init_network_data(S_NETWORK net){
 //戻り値    正値:ネットワークのサイズ
 //          -1:ファイル異常
 //          -2:そのほか異常
-int get_network_info(int *layer_size,int *neurons_size){
+int get_network_info(S_NETWORK * pnet){
     FILE * fp;
     fp=fopen(NEURON_FILE_NAME,"r");
     if(fp==NULL){
         return -1;
     }
-    fscanf(fp,"%d",layer_size);
-    if(*layer_size<2){
+    fscanf(fp,"%d",&(pnet->layer_size));
+    if(pnet->layer_size<2){
         fclose(fp);
         return -1;
     }
-    if(*layer_size>NETWORK_MAX_LAYER){
+    if(pnet->layer_size>NETWORK_MAX_LAYER){
         printf("WARNING : %s\n",NEURON_FILE_NAME);
-        printf("\tlayer size in file is over the threshould :%d / %d\n",*layer_size,NETWORK_MAX_LAYER);
+        printf("\tlayer size in file is over the threshould :%d / %d\n",pnet->layer_size,NETWORK_MAX_LAYER);
     }
-    for(int i=0;i<*layer_size;i++){
+    for(int i=0;i<pnet->layer_size;i++){
         int tmp;
         if(fscanf(fp,"%d",&tmp)==EOF){
             printf("ERROR : %s\n",NEURON_FILE_NAME);
@@ -85,7 +81,7 @@ int get_network_info(int *layer_size,int *neurons_size){
             fclose(fp);
             return -1;
         }
-        neurons_size[i]=tmp;
+        pnet->neurons_size[i]=tmp;
     }
     fclose(fp);
     return 0;
@@ -97,15 +93,14 @@ int get_network_info(int *layer_size,int *neurons_size){
 //戻り値     0:正常
 //          -1:ファイル異常
 //          -2:そのほか異常
-int read_network_data(double **pnet_value,int net_amount){
+int read_network_data(S_NETWORK * pnet,double **pnet_value){
     double buf;
-    int layer_size,i;
-    int neuron_size[NETWORK_MAX_LAYER];
+    int i;
     int ret;
     int datasize;
 
     //ネットワーク情報を取得する
-    ret=get_network_info(&layer_size,neuron_size);
+    ret=get_network_info(pnet);
     if(ret!=0){
         printf("ERROR : get_network_info\n");
         printf("\teroor code : %d\n",ret);
@@ -119,12 +114,12 @@ int read_network_data(double **pnet_value,int net_amount){
         return -1;
     }
     //ファイルの情報を読み飛ばす
-    for(i=0;i<layer_size+1;i++){
+    for(i=0;pnet->layer_size;i++){
         fscanf(fp,"%f",&buf);
     }
     
     //ネットワークデータを読み込む
-    for(i=0;i<net_amount;i++){
+    for(i=0;i<pnet->net_amount;i++){
         fscanf(fp,"%lf",pnet_value[i]);
     }
 
@@ -140,15 +135,14 @@ int read_network_data(double **pnet_value,int net_amount){
 //戻り値     0:正常
 //          -1:ファイル異常
 //          -2:そのほか異常
-int update_network_data(double **pnet_value,int net_amount){
+int update_network_data(S_NETWORK net,double **pnet_value){
     double buf;
-    int layer_size,i;
-    int neuron_size[NETWORK_MAX_LAYER];
+    int i;
     int ret;
     int datasize;
 
     //ネットワーク情報を取得する
-    ret=get_network_info(&layer_size,neuron_size);
+    ret=get_network_info(&net);
     if(ret!=0){
         printf("ERROR : get_network_info\n");
         printf("\teroor code : %d\n",ret);
@@ -156,7 +150,7 @@ int update_network_data(double **pnet_value,int net_amount){
     }
     
     //ファイルを初期化
-    init_network_data(layer_size,neuron_size);
+    init_network_data(net);
 
     //ファイルにデータを追記
     FILE * fp;
@@ -165,7 +159,7 @@ int update_network_data(double **pnet_value,int net_amount){
         return -1;
     }
     //データを更新
-    for(i=0;i<net_amount;i++){
+    for(i=0;i<net.net_amount;i++){
         fprintf(fp,"%lf\n",*(pnet_value[i]));
     }
 
