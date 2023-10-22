@@ -23,7 +23,8 @@ int net_data_amount(S_NETWORK * pnet){
     for(int i=0;i<pnet->layer_size-1;i++){
         ret+=pnet->neurons_size[i+1];
     }
-    return ret;
+    pnet->net_amount=ret;
+    return 0;
 }
 
 
@@ -62,10 +63,12 @@ int get_network_info(S_NETWORK * pnet){
     FILE * fp;
     fp=fopen(NEURON_FILE_NAME,"r");
     if(fp==NULL){
+        printf("ERROR get_network_info : can't open file\n");
         return -1;
     }
     fscanf(fp,"%d",&(pnet->layer_size));
     if(pnet->layer_size<2){
+        printf("ERROR get_network_info : layer size is too small\n");
         fclose(fp);
         return -1;
     }
@@ -76,8 +79,7 @@ int get_network_info(S_NETWORK * pnet){
     for(int i=0;i<pnet->layer_size;i++){
         int tmp;
         if(fscanf(fp,"%d",&tmp)==EOF){
-            printf("ERROR : %s\n",NEURON_FILE_NAME);
-            printf("\tformat error : neuron info not match with layer size\n");
+            printf("ERROR get_network_info : neuron info not match with layer size\n");
             fclose(fp);
             return -1;
         }
@@ -93,19 +95,19 @@ int get_network_info(S_NETWORK * pnet){
 //戻り値     0:正常
 //          -1:ファイル異常
 //          -2:そのほか異常
-int read_network_data(S_NETWORK * pnet,double **pnet_value){
+int read_network_data(S_NETWORK net,double **pnet_value){
     double buf;
     int i;
     int ret;
     int datasize;
 
-    //ネットワーク情報を取得する
-    ret=get_network_info(pnet);
-    if(ret!=0){
-        printf("ERROR : get_network_info\n");
-        printf("\teroor code : %d\n",ret);
-        return -2;
-    }
+    // //ネットワーク情報を取得する
+    // ret=get_network_info(net);
+    // if(ret!=0){
+    //     printf("ERROR : get_network_info\n");
+    //     printf("\teroor code : %d\n",ret);
+    //     return -2;
+    // }
     
     //ファイルを開く
     FILE * fp;
@@ -114,12 +116,12 @@ int read_network_data(S_NETWORK * pnet,double **pnet_value){
         return -1;
     }
     //ファイルの情報を読み飛ばす
-    for(i=0;pnet->layer_size;i++){
+    for(i=0;i<net.layer_size;i++){
         fscanf(fp,"%f",&buf);
     }
     
     //ネットワークデータを読み込む
-    for(i=0;i<pnet->net_amount;i++){
+    for(i=0;i<net.net_amount;i++){
         fscanf(fp,"%lf",pnet_value[i]);
     }
 

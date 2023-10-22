@@ -7,6 +7,9 @@
 #include "teacher_file.h"
 #include "configuration.h"
 
+#include <time.h>
+
+#define D_DEBUG
 /*teacher fileを初期化*/
 //引数  size_X  入力データサイズ
 //      size_T  出力データサイズ
@@ -23,7 +26,32 @@ int init_teacher_file(int size_X,int size_T){
     fclose(fp);
     return 0;
 }
+int read_teacher_size(S_NETWORK * pnet){
+    int SIZE_X;
+    int SIZE_T;
+    int block_size;
+    int count=0;
+    float buf;
+    FILE * fp;
+    fp=fopen(TEACHER_FILE_NAME,"r");
+    if(fp==NULL){
+        return -1;
+    }
+    //skip header file
+    fscanf(fp,"%d",&SIZE_X);
+    fscanf(fp,"%d",&SIZE_T);
 
+    while(fscanf(fp,"%f",&buf)!=EOF)count++;
+    
+    block_size=SIZE_X+SIZE_T;
+
+    if(count%block_size!=0){
+        printf("WARNIGN read_teacher_size : teacher file size is not consistent.\n");
+    }
+    pnet->teacher_size=count/block_size;
+    fclose(fp);
+    return 0;
+}
 /*教師データをデータファイルから読み込む*/
 //引数  X:入力データの行列 
 //      T:正解データの行列
@@ -31,7 +59,7 @@ int init_teacher_file(int size_X,int size_T){
 //          -1:ファイルエラー
 //          -2:ポインタエラー
 //          -3:そのほかのエラー
-int read_teacher_data(S_NETWORK * pnet,S_MATRIX *vX,S_MATRIX *vT){
+int read_teacher_data(S_NETWORK * pnet,S_MATRIX vX[],S_MATRIX vT[]){
     int block_size=0;
     int i;
     int SIZE_X;
@@ -52,22 +80,14 @@ int read_teacher_data(S_NETWORK * pnet,S_MATRIX *vX,S_MATRIX *vT){
     block_size= SIZE_T+SIZE_X;
 
     //read data
-    for(i=0;i<TEACHER_MAX_SIZE*block_size;i++){
+    for(i=0;i<pnet->teacher_size*block_size;i++){
         char ret=fscanf(fp,"%lf",&buf);
         if(ret==EOF){
             break;
         }
         int block_num=i/block_size;
         int data_pos=i%block_size;
-        #ifdef D_DEBUG
-            printf("#debug line:%d  dataset_num:%d  data_pos:%d \n",i+4,block_num,data_pos);
-            if(data_pos<*size_X){
-                printf("#debug data:%f is storage in X[%d] (0,%d)\n",buf,block_num,data_pos);
-                X[block_num].elep[data_pos]=buf;
-            }else{
-                printf("#debug data:%f is storage in T[%d] (0,%d)\n",buf,block_num,data_pos-*size_X);
-            }    
-        #endif
+
         if(data_pos<SIZE_X){
             vX[block_num].elep[data_pos]=buf;
         }else{
@@ -75,7 +95,6 @@ int read_teacher_data(S_NETWORK * pnet,S_MATRIX *vX,S_MATRIX *vT){
         }
     }
     fclose(fp);
-    pnet->teacher_size=i/block_size;
     return 0;
 }
 
@@ -103,11 +122,11 @@ int add_teacher_data(S_NETWORK * pnet,S_MATRIX X,S_MATRIX T){
     fscanf(fp,"%d",&SIZE_T);
     fclose(fp);
 
-    //追加データが既存ファイルと形式が一致するか確認
-    if(SIZE_X!=pnet->neurons_size[0]||SIZE_T!=pnet->neurons_size[pnet->layer_size-1]){
-        printf("ERROR data structure not match with the statement in file\n");
-        return -1;
-    }
+    // //追加データが既存ファイルと形式が一致するか確認
+    // if(SIZE_X!=pnet->neurons_size[0]||SIZE_T!=pnet->neurons_size[pnet->layer_size-1]){
+    //     printf("ERROR in add_teacher_data : data structure not match with the statement in file\n");
+    //     return -1;
+    // }
 
     //追記モードでファイルをオープン
     fp=fopen(TEACHER_FILE_NAME,"a");
@@ -121,6 +140,53 @@ int add_teacher_data(S_NETWORK * pnet,S_MATRIX X,S_MATRIX T){
             fprintf(fp,"\n%lf",T.elep[i]);
     }
     fclose(fp);
+
+    return 0;
+}
+
+
+/*関数　pick_random_teacher_dataset*/
+/*概要　教師データセットから指定数のデータセットをランダムに抽出する*/
+/*引数  教師データセット入力    S_MATRIX * vX
+/*      教師データセット正解    S_MATRIX * vT
+/*      抽出データセット入力    S_MATRIX * vX_out
+/*      抽出データセット正解     S_MATRIX * vT_out
+/*      教師データ数            int size_teacher
+/*      抽出数                  int size_out */
+/*戻り値     0  正常終了*/
+/*          -1  ポインタエラー*/
+/*          -2そのほかエラー*/
+int pick_random_teacher_dataset(S_MATRIX * vX,S_MATRIX * vT,S_MATRIX *vX_out,S_MATRIX * vT_out,int size_teacher,int size_out){
+    
+    srand((unsigned int)time(NULL));
+    //NULL CHECK
+    if(vX==NULL || vT==NULL || vX_out==NULL || vT_out==NULL){
+        return -1;
+    }
+    if(size_teacher<size_out){
+        printf("ERROR ###pick_random_teacher_dataset###\n\tinput error : size_out is larger than size_teacher\n");
+        return -2;
+    }
+
+    int data_arrow[TEACHER_MAX_SIZE];
+    int data_arrow_out[TEACHER_MAX_SIZE];
+    
+    for(int i=0;i<size_teacher;i++){
+        data_arrow[i]=i;
+    }
+
+    for(int i=0;i<size_out;i++){
+        int rnd=rand()%(size_teacher-i);
+        data_arrow_out[i]=data_arrow[rnd];
+        for(int j=rnd;j<size_teacher-i-1;j++){
+            data_arrow[j]=data_arrow[j+1];
+        }
+    }
+
+    for(int i=0;i<size_out;i++){
+        memcpy(&vX_out[i],&vX[data_arrow_out[i]],sizeof(vX[0]));
+        memcpy(&vT_out[i],&vT[data_arrow_out[i]],sizeof(vT[0]));
+    }
 
     return 0;
 }

@@ -64,20 +64,20 @@ int gradient_descent(S_NETWORK net,S_MATRIX *vX,S_MATRIX *vT, S_MATRIX * vW,S_MA
 //          -1:ポインタエラー
 //          -2:ファイルエラー
 //          -3:そのほかエラー
-int aggregate_network_data(S_NETWORK net,S_MATRIX* vW,S_MATRIX* vB,double **pnet_value){
+int aggregate_network_data(S_NETWORK net,S_MATRIX vW[],S_MATRIX vB[],double **pnet_value){
     int i,j,n;
 
     //ネットワークの変数W,Bの各要素へのポインタの配列を作成。
     n=0;
     for(i=0;i<net.layer_size-1;i++){
         for(j=0;j<SIZE(vW[i]);j++){
-            *(pnet_value+n)=vW[i].elep+j;
+            pnet_value[n]=&(vW[i].elep[j]);
             n++;
         }
     }
     for(i=0;i<net.layer_size-1;i++){
         for(j=0;j<SIZE(vB[i]);j++){
-            *(pnet_value+n)=vB[i].elep+j;             
+            pnet_value[n]=&(vB[i].elep[j]);             
             n++;
         }
     }

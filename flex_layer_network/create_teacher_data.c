@@ -4,10 +4,6 @@
 #include <math.h>
 #include <time.h>
 #include "matrix.h"
-#include "two_layer_net.h"
-#include "loss_function.h"
-#include "gradient.h"
-#include "gradient_descent.h"
 #include "teacher_file.h"
 
 #define MESH_X (30)
@@ -19,6 +15,7 @@
 
 
 int main(void){
+    S_NETWORK net;
     S_MATRIX X;
     S_MATRIX T;
     F_CREATE_MATRIX(1,2,&X);
@@ -31,6 +28,7 @@ int main(void){
 
     srand((unsigned int)time(NULL));
 
+    net.teacher_size=0;
     ret=init_teacher_file(2,2);
     
     for(int i=0;i<MESH_X;i++){
@@ -48,7 +46,7 @@ int main(void){
                 T.elep[1]=1.0;
             }
             /*************************/
-            add_teacher_data(2,2,X,T);
+            add_teacher_data(&net,X,T);
         }
 
     }
