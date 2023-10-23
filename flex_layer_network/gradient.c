@@ -20,7 +20,7 @@ int calc_gradient(S_NETWORK net,S_MATRIX X,S_MATRIX T,S_MATRIX * vW,S_MATRIX * v
         F_CREATE_MATRIX(net.neurons_size[i],net.neurons_size[i+1],&vWtmp[i]);
     }
     for(i=0;i<net.layer_size-1;i++){
-        F_CREATE_MATRIX(net.neurons_size[i],net.neurons_size[i+1],&vBtmp[i]);
+        F_CREATE_MATRIX(1,net.neurons_size[i+1],&vBtmp[i]);
     }
     F_CREATE_MATRIX(1,net.neurons_size[net.layer_size-1],&Y);
 

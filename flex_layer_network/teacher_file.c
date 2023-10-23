@@ -156,7 +156,7 @@ int add_teacher_data(S_NETWORK * pnet,S_MATRIX X,S_MATRIX T){
 /*戻り値     0  正常終了*/
 /*          -1  ポインタエラー*/
 /*          -2そのほかエラー*/
-int pick_random_teacher_dataset(S_MATRIX * vX,S_MATRIX * vT,S_MATRIX *vX_out,S_MATRIX * vT_out,int size_teacher,int size_out){
+int pick_random_teacher_dataset(S_MATRIX * vX,S_MATRIX * vT,S_MATRIX * vX_out,S_MATRIX * vT_out,int size_teacher,int size_out){
     
     srand((unsigned int)time(NULL));
     //NULL CHECK
@@ -184,8 +184,8 @@ int pick_random_teacher_dataset(S_MATRIX * vX,S_MATRIX * vT,S_MATRIX *vX_out,S_M
     }
 
     for(int i=0;i<size_out;i++){
-        memcpy(&vX_out[i],&vX[data_arrow_out[i]],sizeof(vX[0]));
-        memcpy(&vT_out[i],&vT[data_arrow_out[i]],sizeof(vT[0]));
+        vX_out[i].elep=vX[data_arrow_out[i]].elep;
+        vT_out[i].elep=vT[data_arrow_out[i]].elep;
     }
 
     return 0;
