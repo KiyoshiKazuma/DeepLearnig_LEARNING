@@ -9,7 +9,7 @@
 
 #include <time.h>
 
-#define D_DEBUG
+//#define D_DEBUG
 /*teacher fileを初期化*/
 //引数  size_X  入力データサイズ
 //      size_T  出力データサイズ
@@ -184,8 +184,21 @@ int pick_random_teacher_dataset(S_MATRIX * vX,S_MATRIX * vT,S_MATRIX * vX_out,S_
     }
 
     for(int i=0;i<size_out;i++){
-        vX_out[i].elep=vX[data_arrow_out[i]].elep;
-        vT_out[i].elep=vT[data_arrow_out[i]].elep;
+        for(int j=0;j<vX->column;j++){
+            vX_out[i].elep[j]=vX[data_arrow_out[i]].elep[j];
+        }
+        for(int j=0;j<vT->column;j++){
+            vT_out[i].elep[j]=vT[data_arrow_out[i]].elep[j];
+        }
+        #ifdef D_DEBUG
+        for(int j=0;j<vX->column;j++){
+            printf("\t%lf",vX_out[i].elep[j]);
+        }
+        for(int j=0;j<vT->column;j++){
+            printf("\t%lf",vT_out[i].elep[j]);
+        }
+        printf("\n");
+        #endif//D_DEBUG
     }
 
     return 0;

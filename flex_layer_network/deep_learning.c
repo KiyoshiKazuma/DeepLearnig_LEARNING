@@ -13,7 +13,7 @@
 #include "configuration.h"
 
 #define REPEAT_MAX (1000)
-#define THRESHOULD (0.01)
+#define THRESHOULD (0.1)
 //#define D_DEBUG
 #define MULTI
 

@@ -6,8 +6,8 @@
 #include "matrix.h"
 #include "teacher_file.h"
 
-#define MESH_X (30)
-#define MESH_Y (30)
+#define MESH_X (100)
+#define MESH_Y (100)
 #define MAX_X (1.0)
 #define MIN_X (-1.0)
 #define MAX_Y (1.0)

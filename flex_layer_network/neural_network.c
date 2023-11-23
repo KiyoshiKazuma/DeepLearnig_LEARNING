@@ -45,7 +45,8 @@ int neural_network(S_NETWORK net,S_MATRIX X,S_MATRIX *pY,S_MATRIX *vW,S_MATRIX *
     for(i=0;i<net.layer_size;i++){
         F_DELETE_MATRIX(&vZ[i]);
     }
-
+    free(vA);
+    free(vZ);
     return 0;    
 }
 
