@@ -1,39 +1,46 @@
+
 #include<stdio.h>
 #include<stdlib.h>
 #include <math.h>
 #include"matrix.h"
 
-/*関数　F_CREATE_MATRIX
+/*関数　create_matrix
 概要    行列を生成する
-引数    int i   行番号
-        int j   列番号
-        S_MATRIX * mat  配列のポインタ
-戻り値  int 0   異常
-            1   正常
+引数    unsinged int row_size   行番号
+        unsigned int column_size   列番号
+戻り値  異常：NULL   
+        正常：MATRIXハンドラ
 */
-int F_CREATE_MATRIX(unsigned int i, unsigned int j, S_MATRIX* mat) {
-    unsigned int size = i * j;
-    double * vec =(double *) malloc(sizeof(double) * size);
-    mat->elep = vec;
-    mat->row = i;
-    mat->column = j;
+H_MATRIX create_matrix(unsigned int row_size, unsigned int column_size) {
+    S_MATRIX * hMatrix=NULL;
+    hMatrix = (S_MATRIX*)malloc(sizeof(S_MATRIX));
+    if(hMatrix==NULL){
+        return NULL;
+    }
+    hMatrix->column=column_size;
+    hMatrix->row=row_size;
+    hMatrix->size=row_size*column_size;
+    double * vec =(double *) malloc(sizeof(double) * hMatrix->size);
+    hMatrix->pElem=vec;
 
-    return 1;
+    return hMatrix;
 }
 
-/*関数　F_DELETE_MATRIX
+/*関数　delete_matrix
 概要    行列を削除する
-引数    S_MATRIX * mat  配列のポインタ
-戻り値  int 0   異常
-            1   正常
+引数    H_MATRIX hMatrix  行列ハンドラ
+戻り値   0:正常
+        -1:異常
 */
-int F_DELETE_MATRIX(S_MATRIX* mat) {
-    free(mat->elep);
-    return 1;
+int delete_matrix(H_MATRIX hMatrix) {
+    S_MATRIX * pMatrix=(S_MATRIX *)hMatrix;
+    free(pMatrix->pElem);
+    free(pMatrix);
+    return 0;
 }
 
 
-/*関数　F_ELEMENT_NUM
+/*関数　element_num_matrix
 概要　行列の行・列番号から配列の番号を返す。
 引数　  int i   行番号
         int j   列番号
@@ -41,27 +48,27 @@ int F_DELETE_MATRIX(S_MATRIX* mat) {
 戻り値 非負値　配列の番号
         -1    エラー
 */
-int F_ELEMENT_NUM(unsigned int i,unsigned int j, S_MATRIX* mat) {
+int element_num_matrix(unsigned int i,unsigned int j, S_MATRIX* mat) {
     if (mat == NULL) {
-        printf("ERROR:###F_ELEMENT_NUM###\ninput pointa contins NULL\n");
+        printf("ERROR:###element_num_matrix###\ninput pointa contins NULL\n");
         return -1;
     }
     if (i >= mat->row || j >= mat->column) {
-        printf("ERROR:###F_ELEMENT_NUM###\nmatrix element num out of range\n");
+        printf("ERROR:###element_num_matrix###\nmatrix element num out of range\n");
         return -2;
     }
     int n = mat->column * i + j;
     return n;
 }
 
-/*  関数　F_PRINT
+/*  関数　print_matrix
 概要　行列を表示する
 引数    S_MATRIX *mat 表示する行列
 戻り値  0:正常　１：異常
 */
-int F_PRINT(S_MATRIX* mat) {
+int print_matrix(S_MATRIX* mat) {
     if (mat == NULL) {
-        printf("ERROR:###F_PRINT###\ninput pointa contins NULL\n");
+        printf("ERROR:###print_matrix###\ninput pointa contins NULL\n");
         return 1;
     }
     int i, j, n;
@@ -75,21 +82,21 @@ int F_PRINT(S_MATRIX* mat) {
     }
 }
 
-/*  関数　F_ADD
+/*  関数　add_matrix
 概要　行列の和を求めてretに返す。
 引数    S_MATRIX *a,b 和を求める行列のポインタ
         S_MATRIX *ret 返す行列のポインタ
 戻り値  0:正常　1:行列のサイズが異なる　2:そのほかエラー
 */
 
-int F_ADD(S_MATRIX* a, S_MATRIX* b, S_MATRIX* ret) {
+int add_matrix(S_MATRIX* a, S_MATRIX* b, S_MATRIX* ret) {
     unsigned int i, j,size;
     if (a == NULL || b == NULL || ret == NULL) {
-        printf("ERROR:###F_ADD###\ninput pointa contins NULL\n");
+        printf("ERROR:###add_matrix###\ninput pointa contins NULL\n");
         return 2;
     }
     if (a->row != b->row || a->column != b->column) {
-        printf("ERROR:###F_ADD###\nmatrix size not match\n");
+        printf("ERROR:###add_matrix###\nmatrix size not match\n");
         return 1;
     }
     size=ret->column*ret->row;
@@ -100,22 +107,22 @@ int F_ADD(S_MATRIX* a, S_MATRIX* b, S_MATRIX* ret) {
     return 0;
 }
 
-/*  関数　F_PRODUCT
+/*  関数　product_matrix
 概要　行列の内積を求めてretに返す。
 引数    S_MATRIX *a,b 積を求める行列のポインタ
         S_MATRIX *ret 返す行列のポインタ
 戻り値  0:正常　1:行列のサイズが異なる　2:そのほかエラー
 */
-int F_PRODUCT(S_MATRIX* a, S_MATRIX* b, S_MATRIX* ret) {
+int product_matrix(S_MATRIX* a, S_MATRIX* b, S_MATRIX* ret) {
     unsigned int i, j, k, n;
     //NULLチェック
     if (a == NULL || b == NULL || ret == NULL) {
-        printf("ERROR:###F_ADD###\ninput pointa contins NULL\n");
+        printf("ERROR:###add_matrix###\ninput pointa contins NULL\n");
         return 2;
     }
     //サイズチェック
     if (a->column != b->row) {
-        printf("ERROR:###F_ADD###\nmatrix size not match\n");
+        printf("ERROR:###add_matrix###\nmatrix size not match\n");
         return 1;
     }
     //出力配列のサイズを計算
@@ -131,72 +138,10 @@ int F_PRODUCT(S_MATRIX* a, S_MATRIX* b, S_MATRIX* ret) {
     for (i = 0; i < row; i++) {
         for (j = 0; j < column; j++) {
             for (k = 0; k < n; k++) {
-                ret->elep[F_ELEMENT_NUM(i, j, ret)] += a->elep[F_ELEMENT_NUM(i, k, a)] * b->elep[F_ELEMENT_NUM(k, j, b)];
+                ret->elep[element_num_matrix(i, j, ret)] += a->elep[element_num_matrix(i, k, a)] * b->elep[element_num_matrix(k, j, b)];
             }
         }
     }
 
-    return 0;
-}
-
-/*  関数　F_FUNCTION
-概要　  入力ベクトルの各要素を関数に入れて出力ベクトルの各要素に返す。
-引数    S_MATRIX *in,out 入力、出力ベクトルのポインタ
-        double  (*pfunc) (double) 用いる関数の関数ポインタ
-戻り値  0:正常　1:行列のサイズが異なる　2:そのほかエラー
-*/
-int F_FUNCTION(S_MATRIX* in, S_MATRIX* out, double (*pfunc) (double)) {
-    if (in->column != out->column || in->row != 1 || out->row != 1 || in->elep == 0 || out->elep == 0) {
-        printf("ERROR###matrix.c--F_FUNCTION");
-        return 1;
-    }
-    int i;
-    for (i = 0; i < in->column; i++) {
-        out->elep[i] = pfunc(in->elep[i]);
-    }
-    return 0;
-}
-/*  関数　F_SOFTMAX
-概要　  ベクトルにソフトマックス関数を作用させて返す
-引数    S_MATRIX *int 入力ベクトルのポインタ
-        S_MATRIX *out 返すベクトルののポインタ
-戻り値  0:正常　1:行列のサイズが異なる　2:そのほかエラー
-*/
-/// <summary>
-/// ソフトマックス関数を計算します
-/// </summary>
-int F_SOFTMAX(S_MATRIX* in,S_MATRIX * out){
-    int i;
-    double max,base;
-    if(in==NULL || out==NULL ){
-         printf("ERROR###matrix.c##F_SOFTMAX#NULL POINTER\n");
-        return 2; 
-    }
-    if(in->row !=out->row  ||in->column!=out->column){
-         printf("ERROR###matrix.c##F_SOFTMAX#size not match\n");
-        return 1;
-    }
-       
-
-    max=0;
-    for(i=0;i<in->column;i++){
-        if(max<in->elep[i])max=in->elep[i];
-    }
-
-    base=0;
-    for(i=0;i<in->column;i++){
-        base+=exp(in->elep[i]-max);
-    }
-    for(i=0;i<in->column;i++){    
-        out->elep[i]=exp(in->elep[i]-max)/base;
-    }
-/*
-    printf("SOFTMAX \n");
-    printf("input\n");
-    F_PRINT(in);
-    printf("output\n");
-    F_PRINT(out);
-    printf("\n");
-    */
     return 0;
 }

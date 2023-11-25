@@ -1,20 +1,17 @@
-#ifndef H_MATRIX
-#define H_MATRIX
+#ifndef D_MATRIX
+#define D_MATRIX
 
 typedef struct {
-    double* elep;
+    double* pElem;
     unsigned int row;
     unsigned int column;
+    unsigned int size;
 }S_MATRIX;
 
-#define SIZE(x) (x.row*x.column)
+typedef void * H_MATRIX;
 
-int F_PRINT(S_MATRIX* mat);
-int F_ADD(S_MATRIX* a, S_MATRIX* b, S_MATRIX* ret);
-int F_PRODUCT(S_MATRIX* a, S_MATRIX* b, S_MATRIX* ret);
-int F_ELEMENT_NUM(unsigned int i,unsigned  int j, S_MATRIX* mat);
-int F_CREATE_MATRIX(unsigned int i, unsigned int j, S_MATRIX* mat);
-int F_DELETE_MATRIX(S_MATRIX* mat);
-int F_FUNCTION(S_MATRIX* in, S_MATRIX* out, double (*pfunc) (double));
-int F_SOFTMAX(S_MATRIX* in,S_MATRIX * out);
-#endif
+H_MATRIX create_matrix(unsigned int row_size, unsigned int column_size);
+int delete_matrix(H_MATRIX hMatrix);
+int add_matrix(H_MATRIX hMatix_IN1, H_MATRIX hMatix_IN2, H_MATRIX hMatix_OUT);
+int product_matrix(H_MATRIX hMatix_IN1, H_MATRIX hMatix_IN2, H_MATRIX hMatix_OUT);
+#endif //D_MATRIX

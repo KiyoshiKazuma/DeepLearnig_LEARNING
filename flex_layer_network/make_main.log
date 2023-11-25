@@ -1,9 +1,0 @@
-deep_learning.c: In function 'main':
-deep_learning.c:31:31: error: expected ')' before 'net'
-   31 |     printf("layer size : %d\n"net.layer_size);
-      |                               ^~~
-      |                               )
-deep_learning.c:50:33: error: expected ')' before 'net'
-   50 |     printf("teacher size : %d\n"net.teacher_size);
-      |                                 ^~~
-      |                                 )

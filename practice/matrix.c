@@ -10,8 +10,16 @@
 戻り値  int 0   異常
             1   正常
 */
-H_MATRIX create_matrix(unsigned int i, unsigned int j, S_MATRIX* mat) {
-    unsigned int size = i * j;
+H_MATRIX create_matrix(unsigned int row_size, unsigned int column_size) {
+    S_MATRIX * pMATRIX=NULL;
+    pMATRIX = (S_MATRIX *)malloc(sizeof(S_MATRIX));
+    if(pMATRIX==NULL){
+        return NULL;
+    }
+    pMATRIX->column=column_size;
+    pMATRIX->row=row_size;
+    pMATRIX->size=pMATRIX->column*pMATRIX->row;
+    
     double * vec =(double *) malloc(sizeof(double) * size);
     mat->elep = vec;
     mat->row = i;
