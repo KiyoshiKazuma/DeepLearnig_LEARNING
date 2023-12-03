@@ -1,0 +1,1 @@
+gcc test_1_matrix.c ../matrix.c -o test_1.exe
