@@ -1,27 +1,28 @@
-
-#include<stdio.h>
-#include<stdlib.h>
+#include <stdio.h>
+#include <stdlib.h>
 #include <math.h>
-#include"matrix.h"
+#include "matrix.h"
 
 /*関数　create_matrix
 概要    行列を生成する
 引数    unsinged int row_size   行番号
         unsigned int column_size   列番号
-戻り値  異常：NULL   
+戻り値  異常：NULL
         正常：MATRIXハンドラ
 */
-H_MATRIX create_matrix(unsigned int row_size, unsigned int column_size) {
-    S_MATRIX * hMatrix=NULL;
-    hMatrix = (S_MATRIX*)malloc(sizeof(S_MATRIX));
-    if(hMatrix==NULL){
+H_MATRIX create_matrix(unsigned int row_size, unsigned int column_size)
+{
+    S_MATRIX *hMatrix = NULL;
+    hMatrix = (S_MATRIX *)malloc(sizeof(S_MATRIX));
+    if (hMatrix == NULL)
+    {
         return NULL;
     }
-    hMatrix->column=column_size;
-    hMatrix->row=row_size;
-    hMatrix->size=row_size*column_size;
-    double * vec =(double *) malloc(sizeof(double) * hMatrix->size);
-    hMatrix->pElem=vec;
+    hMatrix->column = column_size;
+    hMatrix->row = row_size;
+    hMatrix->size = row_size * column_size;
+    double *vec = (double *)malloc(sizeof(double) * hMatrix->size);
+    hMatrix->pElem = vec;
 
     return hMatrix;
 }
@@ -32,76 +33,65 @@ H_MATRIX create_matrix(unsigned int row_size, unsigned int column_size) {
 戻り値   0:正常
         -1:異常
 */
-int delete_matrix(H_MATRIX hMatrix) {
-    S_MATRIX * pMatrix=(S_MATRIX *)hMatrix;
+int delete_matrix(H_MATRIX hMatrix)
+{
+    S_MATRIX *pMatrix = (S_MATRIX *)hMatrix;
     free(pMatrix->pElem);
     free(pMatrix);
     return 0;
 }
 
-
 /*関数　element_num_matrix
 概要　行列の行・列番号から配列の番号を返す。
-引数　  int i   行番号
+引数    H_MATRIX * hMatrix 行列のハンドラ
+        int i   行番号
         int j   列番号
-        S_MATRIX * mat 配列のポインタ
 戻り値 非負値　配列の番号
         -1    エラー
 */
-int element_num_matrix(unsigned int i,unsigned int j, S_MATRIX* mat) {
-    if (mat == NULL) {
-        printf("ERROR:###element_num_matrix###\ninput pointa contins NULL\n");
-        return -1;
-    }
-    if (i >= mat->row || j >= mat->column) {
+int element_num_matrix(H_MATRIX hMatrix, int i, int j)
+{
+    S_MATRIX *pMatrix = (S_MATRIX *)hMatrix;
+    if (i >= pMatrix->row || j >= pMatrix->column)
+    {
         printf("ERROR:###element_num_matrix###\nmatrix element num out of range\n");
         return -2;
     }
-    int n = mat->column * i + j;
+    int n = pMatrix->column * i + j;
     return n;
-}
-
-/*  関数　print_matrix
-概要　行列を表示する
-引数    S_MATRIX *mat 表示する行列
-戻り値  0:正常　１：異常
-*/
-int print_matrix(S_MATRIX* mat) {
-    if (mat == NULL) {
-        printf("ERROR:###print_matrix###\ninput pointa contins NULL\n");
-        return 1;
-    }
-    int i, j, n;
-    n = 0;
-    for (i = 0; i < mat->row; i++) {
-        for (j = 0; j < mat->column; j++) {
-            printf("%4.4f  ", mat->elep[n]);
-            n++;
-        }
-        printf("\n");
-    }
 }
 
 /*  関数　add_matrix
 概要　行列の和を求めてretに返す。
-引数    S_MATRIX *a,b 和を求める行列のポインタ
-        S_MATRIX *ret 返す行列のポインタ
-戻り値  0:正常　1:行列のサイズが異なる　2:そのほかエラー
+引数    H_MATRIX hMatrix_IN1 入力行列のハンドラー
+        H_MATRIX hMatrix_IN2 入力行列のハンドラー
+        H_MATRIX hMatrix_OUT 出力行列のハンドラー
+戻り値   0:正常
+　　　　-1:異常
 */
+int add_matrix(H_MATRIX hMatrix_IN1, H_MATRIX hMatrix_IN2, H_MATRIX hMatrix_OUT)
+{
+    S_MATRIX *pMatrix_IN1 = (S_MATRIX *)hMatrix_IN1;
+    S_MATRIX *pMatrix_IN2 = (S_MATRIX *)hMatrix_IN2;
+    S_MATRIX *pMatrix_OUT = (S_MATRIX *)hMatrix_OUT;
+    int i, j, size;
 
-int add_matrix(S_MATRIX* a, S_MATRIX* b, S_MATRIX* ret) {
-    unsigned int i, j,size;
-    if (a == NULL || b == NULL || ret == NULL) {
-        printf("ERROR:###add_matrix###\ninput pointa contins NULL\n");
-        return 2;
-    }
-    if (a->row != b->row || a->column != b->column) {
+    // format check
+    if (pMatrix_IN1->row != pMatrix_IN2->row || pMatrix_IN1->column != pMatrix_IN2->column)
+    {
         printf("ERROR:###add_matrix###\nmatrix size not match\n");
-        return 1;
+        return -1;
     }
-    size=ret->column*ret->row;
-    for (i = 0; i < size; i++) {
-        ret->elep[i] = a->elep[i] + b->elep[i];
+    if (pMatrix_IN1->row != pMatrix_OUT->row || pMatrix_IN1->column != pMatrix_OUT->column)
+    {
+        printf("ERROR:###add_matrix###\nmatrix size not match\n");
+        return -1;
+    }
+
+    // execute calucuration
+    for (i = 0; i < pMatrix_OUT->size; i++)
+    {
+        pMatrix_OUT->pElem[i] = pMatrix_IN1->pElem[i] + pMatrix_IN2->pElem[i];
     }
 
     return 0;
@@ -109,39 +99,64 @@ int add_matrix(S_MATRIX* a, S_MATRIX* b, S_MATRIX* ret) {
 
 /*  関数　product_matrix
 概要　行列の内積を求めてretに返す。
-引数    S_MATRIX *a,b 積を求める行列のポインタ
-        S_MATRIX *ret 返す行列のポインタ
-戻り値  0:正常　1:行列のサイズが異なる　2:そのほかエラー
+引数    H_MATRIX hMatrix_IN1 入力行列のハンドラー
+        H_MATRIX hMatrix_IN2 入力行列のハンドラー
+        H_MATRIX hMatrix_OUT 出力行列のハンドラー
+戻り値   0:正常
+　　　　-1:異常
 */
-int product_matrix(S_MATRIX* a, S_MATRIX* b, S_MATRIX* ret) {
+int product_matrix(H_MATRIX hMatrix_IN1, H_MATRIX hMatrix_IN2, H_MATRIX hMatrix_OUT)
+{
+    S_MATRIX *pMatrix_IN1 = (S_MATRIX *)hMatrix_IN1;
+    S_MATRIX *pMatrix_IN2 = (S_MATRIX *)hMatrix_IN2;
+    S_MATRIX *pMatrix_OUT = (S_MATRIX *)hMatrix_OUT;
     unsigned int i, j, k, n;
-    //NULLチェック
-    if (a == NULL || b == NULL || ret == NULL) {
-        printf("ERROR:###add_matrix###\ninput pointa contins NULL\n");
-        return 2;
-    }
-    //サイズチェック
-    if (a->column != b->row) {
+
+    // format check
+    if (pMatrix_IN1->column != pMatrix_IN2->row)
+    {
         printf("ERROR:###add_matrix###\nmatrix size not match\n");
-        return 1;
+        return -1;
     }
-    //出力配列のサイズを計算
-    unsigned int row = a->row, column = b->column;
-    ret->row = row;
-    ret->column = column;
-    unsigned int size = row * column;
-    n = a->column;
+    if (pMatrix_IN1->row != pMatrix_OUT->row || pMatrix_IN2->column != pMatrix_OUT->column)
+    {
+        printf("ERROR:###add_matrix###\nmatrix size not match\n");
+        return -1;
+    }
 
-    for (i = 0; i < size; i++)ret->elep[i] = 0;
-
-    //要素を計算
-    for (i = 0; i < row; i++) {
-        for (j = 0; j < column; j++) {
-            for (k = 0; k < n; k++) {
-                ret->elep[element_num_matrix(i, j, ret)] += a->elep[element_num_matrix(i, k, a)] * b->elep[element_num_matrix(k, j, b)];
+    // execute calucuration
+    for (i = 0; i < pMatrix_OUT->row; i++)
+    {
+        for (j = 0; j < pMatrix_OUT->column; j++)
+        {
+            pMatrix_OUT->pElem[element_num_matrix(hMatrix_OUT, i, j)] = 0;
+            for (k = 0; k < pMatrix_IN1->column; k++)
+            {
+                pMatrix_OUT->pElem[element_num_matrix(hMatrix_OUT, i, j)] += pMatrix_IN1->pElem[element_num_matrix(hMatrix_OUT, i, k)] * pMatrix_IN2->pElem[element_num_matrix(hMatrix_OUT, k, j)];
             }
         }
     }
 
     return 0;
 }
+
+/*  関数　print_matrix
+概要　行列を表示する
+引数    H_MATRIX hMatrix 表示する行列
+戻り値   0:正常　
+        -1:異常
+*/
+int print_matrix(H_MATRIX hMatrix)
+{
+    S_MATRIX *pMatrix = (S_MATRIX *)hMatrix;
+
+    for (int i = 0; i < pMatrix->row; i++)
+    {
+        for (int j = 0; j < pMatrix->column; j++)
+        {
+            printf("%4.4f  ", pMatrix->pElem[element_num_matrix(hMatrix,i,j)]);
+        }
+        printf("\n");
+    }
+}
+

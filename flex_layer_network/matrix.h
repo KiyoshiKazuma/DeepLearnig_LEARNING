@@ -14,4 +14,5 @@ H_MATRIX create_matrix(unsigned int row_size, unsigned int column_size);
 int delete_matrix(H_MATRIX hMatrix);
 int add_matrix(H_MATRIX hMatix_IN1, H_MATRIX hMatix_IN2, H_MATRIX hMatix_OUT);
 int product_matrix(H_MATRIX hMatix_IN1, H_MATRIX hMatix_IN2, H_MATRIX hMatix_OUT);
+int print_matrix(H_MATRIX hMatrix);
 #endif //D_MATRIX
