@@ -132,7 +132,7 @@ int product_matrix(H_MATRIX hMatrix_IN1, H_MATRIX hMatrix_IN2, H_MATRIX hMatrix_
             pMatrix_OUT->pElem[element_num_matrix(hMatrix_OUT, i, j)] = 0;
             for (k = 0; k < pMatrix_IN1->column; k++)
             {
-                pMatrix_OUT->pElem[element_num_matrix(hMatrix_OUT, i, j)] += pMatrix_IN1->pElem[element_num_matrix(hMatrix_OUT, i, k)] * pMatrix_IN2->pElem[element_num_matrix(hMatrix_OUT, k, j)];
+                pMatrix_OUT->pElem[element_num_matrix(hMatrix_OUT, i, j)] += pMatrix_IN1->pElem[element_num_matrix(hMatrix_IN1, i, k)] * pMatrix_IN2->pElem[element_num_matrix(hMatrix_IN2, k, j)];
             }
         }
     }
