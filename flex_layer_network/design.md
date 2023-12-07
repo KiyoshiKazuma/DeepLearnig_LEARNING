@@ -25,17 +25,112 @@
 #####概要
 ニューラルネットワークの１レイヤーの情報を保持する。
 フォワード、バックワードの計算を提供する。
+決まった入力ベクトルのサイズと出力ベクトルのサイズを持つ。
 #####変数 S_LAYER
 |型|変数名|概要|
 |-:|:-|:-|
-|int|id|layerのid|
+|int|layer_type|layerのタイプ。1:ReLuレイヤー 2:Sigmoidレイヤー 3:Affineレイヤー 4:Sofmaxレイヤー 5:Sofmax-with-Lossレイヤー|
 |int|input_size|layerの入力要素数|
 |int|output_size|layerの出力要素数|
-|int|layer_type|layerのタイプ。1:ReLuレイヤー 2:Sigmoidレイヤー 3:Affineレイヤー 4:Sofmaxレイヤー 5:Sofmax-with-Lossレイヤー|
 |void *|pLayerParams|layer内部変数へのポインタ|
 |void *|pForwardOutput|順伝播計算の出力値へのポインタ|
 |void *|pBackwardOutput|逆伝播計算の出力値へのポインタ|
 
+#####pLayerParamsの要素
+|Layer Type|要素|
+|:-|:-|
+|LT_ReLU|NULL|
+|LT_Sigmoid|NULL|
+|LT_Affine|void *pAffineParams[2]={pW,pB}(ポインタ配列)|
+|LT_Softmax|NULL|
+|LT_SoftmaxWithLoss|void * pSWLParams[2]={pY,pT}(ポインタ配列)|
+
+#####各Layer設計
+######ReLU
+・概要
+各要素についてReLU活性化関数を作用させ、出力する。
+・入出力要素数
+$$
+\text{inputsize} = \text{outputsize}
+$$
+・順伝播関数
+$$Y[i] =\begin{cases}
+ 0 &\text{if }X[i]<0 \\
+X[i] &\text{if }X[i]>0
+\end{cases}$$
+・逆伝播関数
+$$\frac{\partial L}{\partial X[i]} =\begin{cases}
+ 0 &\text{if }Y[i]<0 \\
+ \frac{\partial L}{\partial Y[i]} &\text{if }Y[i]>0
+\end{cases}$$
+
+######Sigmoid
+・概要
+各要素についてSigmoid活性化関数を作用させ、出力する。
+・入出力要素数
+$$
+\text{inputsize} = \text{outputsize}
+$$
+・順伝播関数
+$$
+Y[i]=\frac1 {1+\text{exp}(-X[i])}
+$$
+・逆伝播関数
+$$
+\frac{\partial L}{\partial X[i]} =\frac{\partial L}{\partial Y[i]} Y[i](1-Y[i])
+$$
+######Affine
+・概要
+入力の配列に線形変換行列$W$と$B$を作用させた結果を出力する。
+・入出力要素数
+$W$のサイズは(outputsize,inputsize)
+$B$のサイズは(outputsize,inputsize)
+・順伝播関数
+入力の配列を行列$X$(inputsize,1)
+出力の配列を行列$Y$(outputsize,1)
+とする。
+$$
+Y=W\cdot X+B
+$$
+つまり
+$$
+Y[i,1]=\sum_j W[i,j]\cdot X[j,1]+B[i,1]
+$$
+・逆伝播関数
+$$
+\frac{\partial L}{\partial X[i]}=\sum_j\frac{\partial Y[j]}{\partial X[i]}\frac{\partial L}{\partial Y[j]}=\sum_j W[i,j]\cdot \frac{\partial L}{\partial Y[j]}
+$$また$$
+\begin{cases}
+\frac{\partial L}{\partial B[i]} &= \frac{\partial L}{\partial Y[i]} \\
+\frac{\partial L}{\partial W[i,j]} &= X[j]\cdot \frac{\partial L}{\partial Y[i]}
+\end{cases}
+$$
+もしくは
+$$\frac{\partial L}{\partial X}=\frac{\partial L}{\partial Y}\cdot W^T$$
+$$\frac{\partial L}{\partial W}=X^T\cdot\frac{\partial L}{\partial Y}$$
+$$\frac{\partial L}{\partial B}=\frac{\partial L}{\partial Y}$$
+
+######Softmax
+・概要
+・入出力要素数
+・順伝播関数
+・逆伝播関数
+
+######SoftmaxWithLoss
+・概要
+入力配列にソフトマックスを作用させて正規化し、さらに出力配列と期待値配列を直行エントロピー損失関数をかけて計算する。
+・入出力要素数
+$$
+\text{outputsize}=1
+$$
+・順伝播関数
+$X[\text{inputsize}]\to Y[\text{inputsize}] \& T[\text{inputsize}]\to L[1]$と計算を進める。($T$は期待値配列)
+$$Y[i]=\frac{\text{exp}(X[i])}{\sum_j \text{exp}(X[j])}$$
+$$L=-\sum_i T[i]ln(Y[i])$$
+
+・逆伝播関数
+
+$$\frac{\partial L}{\partial X[i]}=Y[i]-T[i]$$
 
 
 #####機能
@@ -88,7 +183,7 @@ layerに順伝播の入力値を渡し、計算結果(pForwardOutput)を更新�
 |型|引数名|概要|
 |-:|:-|:-|
 |H_LAYER|hLayer|出力対象のlayerのハンドラー|
-|void *|dpInput|入力値のポインター|
+|void *|pInput|入力値のポインター|
 
 ・戻り値int
 正常:0
@@ -108,7 +203,7 @@ layerに誤差逆伝播の入力値を渡し、計算結果(pBackwardOutput)を�
 ・戻り値int
 正常:0
 異常:-1
-
+<!-- 
 ######int update_params
 ・概要
 計算結果(pBackwardOutput)を元に内部変数(pLayerParams)を更新する。
@@ -120,7 +215,7 @@ layerに誤差逆伝播の入力値を渡し、計算結果(pBackwardOutput)を�
 
 ・戻り値int
 正常:0
-異常:-1
+異常:-1 -->
 
 ####matrixハンドラー
 #####H_MATRIX
@@ -233,5 +328,4 @@ matrixの要素を表示する。
 |3|LT_Affine|Affineレイヤー|
 |4|LT_Softmax|Softmaxレイヤー|
 |5|LT_SoftmaxWithLoss|Sofmax-with-Lossレイヤー|
-
 

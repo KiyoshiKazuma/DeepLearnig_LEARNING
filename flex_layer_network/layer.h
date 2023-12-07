@@ -2,17 +2,31 @@
 #define D_LAYER
 
 #include "matrix.h"
+
+enum LayerType{
+	LT_ReLU =1,	
+	LT_Sigmoid =2,	
+	LT_Affine =3,	
+	LT_Softmax =4,	
+	LT_SoftmaxWithLoss =5,
+};
+
 typedef struct{
-    int id;
-    int input_size;
-    int output_size;
-    H_MATRIX * hMat;
-    int next_layer_id;
+    int type;
+    unsigned int input_size;
+    unsigned int output_size;
+    void * pLayerParam;
+	void * pForwardOutput;
+	void * pBackwardOutput;
 }S_LAYER;
 
 typedef void * H_LAYER;
 
-H_LAYER create_layer(int id,int input_size, int output_size);
-int PrintLayer(H_LAYER hLayer);
+H_LAYER create_layer(int type,unsigned int input_size, unsigned int output_size);
+int delete_layer(H_LAYER hLayer);
+int print_layer(H_LAYER hLayer);
+int calc_forword(H_LAYER hLayer,void * pInput);
+int calc_backword(H_LAYER hLayer,void * pInput);
+int update_params(H_LAYER hlayer);
 
 #endif //D_LAYER
