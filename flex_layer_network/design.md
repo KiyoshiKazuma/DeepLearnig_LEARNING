@@ -29,9 +29,9 @@
 #####変数 S_LAYER
 |型|変数名|概要|
 |-:|:-|:-|
-|int|layer_type|layerのタイプ。1:ReLuレイヤー 2:Sigmoidレイヤー 3:Affineレイヤー 4:Sofmaxレイヤー 5:Sofmax-with-Lossレイヤー|
-|int|input_size|layerの入力要素数|
-|int|output_size|layerの出力要素数|
+|int|type|layerのタイプ。1:ReLuレイヤー 2:Sigmoidレイヤー 3:Affineレイヤー 4:Sofmaxレイヤー 5:Sofmax-with-Lossレイヤー|
+|unsinged int|input_size|layerの入力要素数|
+|unsinged int|output_size|layerの出力要素数|
 |void *|pLayerParams|layer内部変数へのポインタ|
 |void *|pForwardOutput|順伝播計算の出力値へのポインタ|
 |void *|pBackwardOutput|逆伝播計算の出力値へのポインタ|
@@ -84,7 +84,7 @@ $$
 入力の配列に線形変換行列$W$と$B$を作用させた結果を出力する。
 ・入出力要素数
 $W$のサイズは(outputsize,inputsize)
-$B$のサイズは(outputsize,inputsize)
+$B$のサイズは(outputsize,1)
 ・順伝播関数
 入力の配列を行列$X$(inputsize,1)
 出力の配列を行列$Y$(outputsize,1)
@@ -183,7 +183,7 @@ layerに順伝播の入力値を渡し、計算結果(pForwardOutput)を更新�
 |型|引数名|概要|
 |-:|:-|:-|
 |H_LAYER|hLayer|出力対象のlayerのハンドラー|
-|void *|pInput|入力値のポインター|
+|double *|vInput|入力値の配列|
 
 ・戻り値int
 正常:0
@@ -198,7 +198,7 @@ layerに誤差逆伝播の入力値を渡し、計算結果(pBackwardOutput)を�
 |型|引数名|概要|
 |-:|:-|:-|
 |H_LAYER|hLayer|出力対象のlayerのハンドラー|
-|void *|pInput|入力値のポインター|
+|double *|vInput|入力値の配列|
 
 ・戻り値int
 正常:0

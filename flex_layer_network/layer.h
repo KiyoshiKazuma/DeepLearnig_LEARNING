@@ -25,8 +25,6 @@ typedef void * H_LAYER;
 H_LAYER create_layer(int type,unsigned int input_size, unsigned int output_size);
 int delete_layer(H_LAYER hLayer);
 int print_layer(H_LAYER hLayer);
-int calc_forword(H_LAYER hLayer,void * pInput);
-int calc_backword(H_LAYER hLayer,void * pInput);
-int update_params(H_LAYER hlayer);
-
+int calc_forword(H_LAYER hLayer,double * vInput);
+int calc_backword(H_LAYER hLayer,double * vInput);
 #endif //D_LAYER

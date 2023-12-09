@@ -8,27 +8,7 @@
 			"args": [
 				"-fdiagnostics-color=always",
 				"-g",
-				"${file}",
-				"-o",
-				"${fileDirname}\\${fileBasenameNoExtension}.exe"
-			],
-			"options": {
-				"cwd": "${fileDirname}"
-			},
-			"problemMatcher": [
-				"$gcc"
-			],
-			"group": "build",
-			"detail": "コンパイラ: C:\\MinGW\\bin\\gcc.exe"
-		},
-		{
-			"type": "cppbuild",
-			"label": "C/C++: gcc.exe アクティブなファイルのビルド",
-			"command": "C:\\MinGW\\bin\\gcc.exe",
-			"args": [
-				"-fdiagnostics-color=always",
-				"-g",
-				"${file}",
+				"${file}","${workspaceFolder}\\matrix.c","${workspaceFolder}\\layer.c",
 				"-o",
 				"${fileDirname}\\${fileBasenameNoExtension}.exe"
 			],
