@@ -4,6 +4,26 @@
 
 H_LAYER create_layer(int type, unsigned int input_size, unsigned int output_size)
 {
+    // argument check
+    if (input_size < 1 || output_size < 1)
+    {
+        return NULL;
+    }
+    switch (type)
+    {
+    // defined types
+    LT_ReLU:
+    LT_Sigmoid:
+    LT_Affine:
+        //	LT_Softmax :
+    LT_SoftmaxWithLoss:
+        break;
+
+    default: // not defined type
+        return NULL;
+        break;
+    }
+
     int error = 0;
 
     H_MATRIX hY = NULL;
@@ -13,10 +33,11 @@ H_LAYER create_layer(int type, unsigned int input_size, unsigned int output_size
     H_MATRIX *pParam = NULL;
     S_LAYER *pLayer = (S_LAYER *)malloc(sizeof(S_LAYER));
 
-    if (input_size < 1 || output_size < 1)
+    if (pLayer == NULL)
     {
         return NULL;
     }
+
     pLayer->type = type;
     pLayer->input_size = input_size;
     pLayer->output_size = output_size;
@@ -29,6 +50,12 @@ H_LAYER create_layer(int type, unsigned int input_size, unsigned int output_size
             pLayer->pLayerParam = NULL;
             pLayer->pBackwardOutput = (void *)malloc(sizeof(double) * pLayer->input_size);
             pLayer->pForwardOutput = (void *)malloc(sizeof(double) * pLayer->output_size);
+            // NULL check
+            if (pLayer->pBackwardOutput == NULL || pLayer->pForwardOutput == NULL)
+            {
+                free(pLayer->pBackwardOutput);
+                free(pLayer->pBackwardOutput);
+            }
         }
         else
         {
@@ -41,6 +68,12 @@ H_LAYER create_layer(int type, unsigned int input_size, unsigned int output_size
             pLayer->pLayerParam = NULL;
             pLayer->pBackwardOutput = (void *)malloc(sizeof(double) * pLayer->input_size);
             pLayer->pForwardOutput = (void *)malloc(sizeof(double) * pLayer->output_size);
+            // NULL check
+            if (pLayer->pBackwardOutput == NULL || pLayer->pForwardOutput == NULL)
+            {
+                free(pLayer->pBackwardOutput);
+                free(pLayer->pBackwardOutput);
+            }
         }
         else
         {
@@ -58,6 +91,14 @@ H_LAYER create_layer(int type, unsigned int input_size, unsigned int output_size
             error = 3;
         }
         pParam = (H_MATRIX *)malloc(sizeof(void *) * 2);
+        // NULL check
+        if (pParam == NULL)
+        {
+            free(pParam);
+            error = 4;
+            break;
+        }
+
         pParam[0] = hW;
         pParam[1] = hB;
         pLayer->pLayerParam = pParam;
@@ -74,6 +115,13 @@ H_LAYER create_layer(int type, unsigned int input_size, unsigned int output_size
                 error = 4;
             }
             pParam = (H_MATRIX *)malloc(sizeof(void *) * 2);
+            // NULL check
+            if (pParam == NULL)
+            {
+                free(pParam);
+                error = 5;
+                break;
+            }
             pParam[0] = hY;
             pParam[1] = hT;
             pLayer->pLayerParam = pParam;
@@ -108,12 +156,14 @@ int print_layer(H_LAYER hLayer)
 
 int delete_layer(H_LAYER hLayer)
 {
-    H_MATRIX *pParam;
-    S_LAYER *pLayer = (S_LAYER *)hLayer;
+    // NULL CEHCK
     if (hLayer == NULL)
     {
         return 1;
     }
+    H_MATRIX *pParam;
+    S_LAYER *pLayer = (S_LAYER *)hLayer;
+
     switch (pLayer->type)
     {
     case LT_ReLU:
@@ -140,6 +190,37 @@ int delete_layer(H_LAYER hLayer)
     free(pLayer);
 
     return 0;
+}
+
+void *PointerLayerParameters(H_LAYER hLayer)
+{
+    // NULL CEHCK
+    if (hLayer == NULL)
+    {
+        return NULL;
+    }
+    S_LAYER *pLayer = (S_LAYER *)hLayer;
+    return pLayer->pLayerParam;
+}
+void *PointerForwardOutput(H_LAYER hLayer)
+{
+    // NULL CEHCK
+    if (hLayer == NULL)
+    {
+        return NULL;
+    }
+    S_LAYER *pLayer = (S_LAYER *)hLayer;
+    return pLayer->pForwardOutput;
+}
+void *PointerBackwardOutput(H_LAYER hLayer)
+{
+    // NULL CEHCK
+    if (hLayer == NULL)
+    {
+        return NULL;
+    }
+    S_LAYER *pLayer = (S_LAYER *)hLayer;
+    return pLayer->pBackwardOutput;
 }
 int calc_forword(H_LAYER hLayer, double *vInput);
 int calc_backword(H_LAYER hLayer, double *vInput);
