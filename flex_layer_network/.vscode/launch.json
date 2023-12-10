@@ -10,7 +10,7 @@
         "-g",
         "${file}",
         "${fileDirname}\\matrix.c",
-        "${fileDirname}\\layer.c",
+        "${fileDirname}\\la yer.c",
         "-o",
         "${fileDirname}\\${fileBasenameNoExtension}.exe"
       ],

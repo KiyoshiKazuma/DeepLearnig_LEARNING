@@ -110,20 +110,24 @@ int test_2_delete_layer(void)
     H_LAYER hLayer = NULL;
     for (int i = 0; test[i].type != -1; i++)
     {
-        hLayer=NULL;
+        hLayer = NULL;
         if (test[i].exp_create == 0)
         {
             hLayer = create_layer(test[i].type, test[i].input_size, test[i].output_size);
-            ret=delete_layer(hLayer);
-            if(ret!=0){
-                test[i].result|=0x2;
-                result=1;
+            ret = delete_layer(hLayer);
+            if (ret != 0)
+            {
+                test[i].result |= 0x2;
+                result = 1;
             }
-        }else{
-            ret=delete_layer(hLayer);
-            if(ret==0){
-                test[i].result|=0x2;
-                result=1;
+        }
+        else
+        {
+            ret = delete_layer(hLayer);
+            if (ret == 0)
+            {
+                test[i].result |= 0x2;
+                result = 1;
             }
         }
     }
@@ -136,26 +140,108 @@ int test_2_print_layer(void)
     H_LAYER hLayer = NULL;
     for (int i = 0; test[i].type != -1; i++)
     {
-        hLayer=NULL;
-        hLayer=create_layer(test[i].type,test[i].input_size,test[i].output_size);
-        ret=print_layer(hLayer);
-        if(ret!=test[i].exp_create){
-            test[i].result|=0x4;
+        hLayer = NULL;
+        hLayer = create_layer(test[i].type, test[i].input_size, test[i].output_size);
+        ret = print_layer(hLayer);
+        if (ret != test[i].exp_create)
+        {
+            test[i].result |= 0x4;
             result = 1;
         }
     }
     return result;
 }
-int test_2_calc_forword(void)
+
+int test_2_PointerLayerParameters(void)
 {
+
     int result = 0;
     int ret = 0;
+    void *pParam = NULL;
+    H_MATRIX *vMatrix = NULL;
     H_LAYER hLayer = NULL;
+    H_MATRIX W = NULL;
+    H_MATRIX B = NULL;
+    H_MATRIX Y = NULL;
+    H_MATRIX T = NULL;
+    S_MATRIX *pMatrix;
+
     for (int i = 0; test[i].type != -1; i++)
     {
-        ;
+        hLayer = create_layer(test[i].type, test[i].input_size, test[i].output_size);
+        pParam = PointerLayerParameters(hLayer);
+        if (test[i].exp_create == 0)
+        {
+            switch (test[i].type)
+            {
+            case LT_Affine:
+                if (pParam == NULL)
+                {
+                    test[i].result |= 0x8;
+                    result = 1;
+                }
+                vMatrix = (H_LAYER *)pParam;
+                W = vMatrix[0];
+                B = vMatrix[1];
+                // size check
+                pMatrix = (S_MATRIX *)W;
+                if (pMatrix->row != test[i].output_size || pMatrix->column != test[i].input_size || pMatrix->size != test[i].input_size * test[i].output_size)
+                {
+                    test[i].result |= 0x8;
+                    result = 1;
+                }
+                pMatrix = (S_MATRIX *)B;
+                if (pMatrix->row != test[i].output_size || pMatrix->column != 1 || pMatrix->size != test[i].output_size)
+                {
+                    test[i].result |= 0x8;
+                    result = 1;
+                }
+            case LT_SoftmaxWithLoss:
+                if (pParam == NULL)
+                {
+                    test[i].result |= 0x8;
+                    result = 1;
+                }
+                vdeMatrix = (H_LAYER *)pParam;
+                W = vMatrix[0];
+                B = vMatrix[1];
+                // size check
+                pMatrix = (S_MATRIX *)W;
+                if (pMatrix->row != test[i].output_size || pMatrix->column != test[i].input_size || pMatrix->size != test[i].input_size * test[i].output_size)
+                {
+                    test[i].result |= 0x8;
+                    result = 1;
+                }
+                pMatrix = (S_MATRIX *)B;
+                if (pMatrix->row != test[i].output_size || pMatrix->column != 1 || pMatrix->size != test[i].output_size)
+                {
+                    test[i].result |= 0x8;
+                    result = 1;
+                }
+            default:
+                if (pParam != NULL)
+                {
+                    test[i].result |= 0x8;
+                    result = 1;
+                }
+                break;
+            }
+        }
+        else
+        {
+            if (pParam != NULL)
+            {
+                test[i].result |= 0x8;
+                result = 1;
+            }
+        }
     }
-    return result;
+}
+return result;
+}
+int test_2_calc_forword(void)
+{
+    return 0;
 }
 int test_2_calc_backword(void)
 {
