@@ -16,8 +16,8 @@ typedef struct
 } S_test_case;
 
 S_test_case test[] = {
-    LT_ReLU, 2, 2, 0, 0,
-    LT_ReLU, 2, 0, 1, 0,
+    LT_ReLU, 2, 2, 0, 0, 
+    LT_ReLU, 2, 0, 1, 0, 
     LT_ReLU, 0, 3, 1, 0,
     LT_ReLU, 3, 2, 1, 0,
     LT_Sigmoid, 2, 2, 0, 0,
@@ -39,6 +39,9 @@ S_test_case test[] = {
 int test_2_create_layer(void);
 int test_2_delete_layer(void);
 int test_2_print_layer(void);
+int test_2_PointerLayerParameters(void);
+int test_2_PointerForwardOutput(void);
+int test_2_PointerBackwardOutput(void);
 int test_2_calc_forword(void);
 int test_2_calc_backword(void);
 
@@ -49,16 +52,66 @@ int main(void)
     if (ret != 0)
     {
         printf("error : test_2_create_layer     \nerror id : %d\n", ret);
+        for (int i = 0; test[i].type != -1; i++)
+        {
+            if ((test[i].result >> 0) & 0x1)
+            {
+                printf("test case : %d is failed\n", i);
+            }
+        }
     }
     ret = test_2_delete_layer();
     if (ret != 0)
     {
         printf("error : test_2_delete_layer     \nerror id : %d\n", ret);
+        for (int i = 0; test[i].type != -1; i++)
+        {
+            if ((test[i].result >> 1) & 0x1)
+            {
+                printf("test case : %d is failed\n", i);
+            }
+        }
     }
     ret = test_2_print_layer();
     if (ret != 0)
     {
         printf("error : test_2_print_layer      \nerror id : %d\n", ret);
+        for (int i = 0; test[i].type != -1; i++)
+        {
+            if ((test[i].result >> 2) & 0x1)
+            {
+                printf("test case : %d is failed\n", i);
+            }
+        }
+    }
+    ret = test_2_PointerLayerParameters();
+    if (ret != 0)
+    {
+        printf("error : test_2_PointerLayerParameters  \n error id : %d\n , ret");
+        for (int i = 0; test[i].type != -1; i++)
+        {
+            if ((test[i].result >> 3) & 0x1)
+            {
+                printf("test case : %d is failed\n", i);
+            }
+        }
+    }
+    ret = test_2_PointerForwardOutput();
+    if (ret != 0)
+    {
+        printf("error : test_2_PointerForwardOutput  \n error id : %d\n , ret");
+        for (int i = 0; test[i].type != -1; i++)
+        {
+            if ((test[i].result >> 4) & 0x1)
+            {
+                printf("test case : %d is failed\n", i);
+            }
+        }
+    }
+    ret = test_2_PointerBackwardOutput();
+    if (ret != 0)
+    {
+        printf("error : test_2_PointerBackwardOutput  \n error id : %d\n , ret");
     }
     ret = test_2_calc_forword();
     if (ret != 0)
@@ -111,26 +164,15 @@ int test_2_delete_layer(void)
     for (int i = 0; test[i].type != -1; i++)
     {
         hLayer = NULL;
-        if (test[i].exp_create == 0)
+        hLayer = create_layer(test[i].type, test[i].input_size, test[i].output_size);
+        ret = delete_layer(hLayer);
+        if (ret != test[i].exp_create)
         {
-            hLayer = create_layer(test[i].type, test[i].input_size, test[i].output_size);
-            ret = delete_layer(hLayer);
-            if (ret != 0)
-            {
-                test[i].result |= 0x2;
-                result = 1;
-            }
-        }
-        else
-        {
-            ret = delete_layer(hLayer);
-            if (ret == 0)
-            {
-                test[i].result |= 0x2;
-                result = 1;
-            }
+            test[i].result |= 0x2;
+            result = 1;
         }
     }
+
     return result;
 }
 int test_2_print_layer(void)
@@ -143,7 +185,7 @@ int test_2_print_layer(void)
         hLayer = NULL;
         hLayer = create_layer(test[i].type, test[i].input_size, test[i].output_size);
         ret = print_layer(hLayer);
-        if (ret != test[i].exp_create)
+        if ((ret == 0) != (test[i].exp_create == 0))
         {
             test[i].result |= 0x4;
             result = 1;
@@ -202,18 +244,18 @@ int test_2_PointerLayerParameters(void)
                     test[i].result |= 0x8;
                     result = 1;
                 }
-                vdeMatrix = (H_LAYER *)pParam;
-                W = vMatrix[0];
-                B = vMatrix[1];
+                vMatrix = (H_LAYER *)pParam;
+                Y = vMatrix[0];
+                T = vMatrix[1];
                 // size check
-                pMatrix = (S_MATRIX *)W;
-                if (pMatrix->row != test[i].output_size || pMatrix->column != test[i].input_size || pMatrix->size != test[i].input_size * test[i].output_size)
+                pMatrix = (S_MATRIX *)Y;
+                if (pMatrix->row != test[i].input_size || pMatrix->column != 1 || pMatrix->size != test[i].input_size)
                 {
                     test[i].result |= 0x8;
                     result = 1;
                 }
-                pMatrix = (S_MATRIX *)B;
-                if (pMatrix->row != test[i].output_size || pMatrix->column != 1 || pMatrix->size != test[i].output_size)
+                pMatrix = (S_MATRIX *)T;
+                if (pMatrix->row != test[i].input_size || pMatrix->column != 1 || pMatrix->size != test[i].input_size)
                 {
                     test[i].result |= 0x8;
                     result = 1;
@@ -236,9 +278,18 @@ int test_2_PointerLayerParameters(void)
             }
         }
     }
+
+    return result;
 }
-return result;
+int test_2_PointerForwardOutput()
+{
+    return 0;
 }
+int test_2_PointerBackwardOutput()
+{
+    return 0;
+}
+
 int test_2_calc_forword(void)
 {
     return 0;

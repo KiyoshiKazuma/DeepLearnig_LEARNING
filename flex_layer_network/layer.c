@@ -144,7 +144,6 @@ int print_layer(H_LAYER hLayer)
 {
     if (hLayer == NULL)
     {
-        printf("layer NULL\n");
         return 1;
     }
     S_LAYER *pLayer = (S_LAYER *)hLayer;
