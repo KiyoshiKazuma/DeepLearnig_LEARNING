@@ -33,8 +33,8 @@
 |unsinged int|input_size|layerの入力要素数|
 |unsinged int|output_size|layerの出力要素数|
 |void *|pLayerParams|layer内部変数へのポインタ|
-|void *|pForwardOutput|順伝播計算の出力値へのポインタ|
-|void *|pBackwardOutput|逆伝播計算の出力値へのポインタ|
+|H_MATRIX|hForwardOutput|順伝播計算の出力行列のハンドラー|
+|H_MATRIX|hBackwardOutput|逆伝播計算の出力行列のハンドラー|
   
 #####pLayerParamsの要素
 |Layer Type|要素|
@@ -50,78 +50,89 @@
 ・概要
 各要素についてReLU活性化関数を作用させ、出力する。
 ・入出力要素数
-<p align="center"><img src="https://latex.codecogs.com/gif.latex?\text{inputsize}%20=%20\text{outputsize}"/></p>  
-  
+$$
+\text{inputsize} = \text{outputsize}
+$$
 ・順伝播関数
-<p align="center"><img src="https://latex.codecogs.com/gif.latex?Y[i]%20=\begin{cases}%200%20&amp;\text{if%20}X[i]&lt;0%20\\X[i]%20&amp;\text{if%20}X[i]&gt;0\end{cases}"/></p>  
-  
+$$Y[i] =\begin{cases}
+ 0 &\text{if }X[i]<0 \\
+X[i] &\text{if }X[i]>0
+\end{cases}$$
 ・逆伝播関数
-<p align="center"><img src="https://latex.codecogs.com/gif.latex?\frac{\partial%20L}{\partial%20X[i]}%20=\begin{cases}%200%20&amp;\text{if%20}Y[i]&lt;0%20\\%20\frac{\partial%20L}{\partial%20Y[i]}%20&amp;\text{if%20}Y[i]&gt;0\end{cases}"/></p>  
-  
-  
+$$\frac{\partial L}{\partial X[i]} =\begin{cases}
+ 0 &\text{if }Y[i]<0 \\
+ \frac{\partial L}{\partial Y[i]} &\text{if }Y[i]>0
+\end{cases}$$
+
 ######Sigmoid
 ・概要
 各要素についてSigmoid活性化関数を作用させ、出力する。
 ・入出力要素数
-<p align="center"><img src="https://latex.codecogs.com/gif.latex?\text{inputsize}%20=%20\text{outputsize}"/></p>  
-  
+$$
+\text{inputsize} = \text{outputsize}
+$$
 ・順伝播関数
-<p align="center"><img src="https://latex.codecogs.com/gif.latex?Y[i]=\frac1%20{1+\text{exp}(-X[i])}"/></p>  
-  
+$$
+Y[i]=\frac1 {1+\text{exp}(-X[i])}
+$$
 ・逆伝播関数
-<p align="center"><img src="https://latex.codecogs.com/gif.latex?\frac{\partial%20L}{\partial%20X[i]}%20=\frac{\partial%20L}{\partial%20Y[i]}%20Y[i](1-Y[i]%20)"/></p>  
-  
+$$
+\frac{\partial L}{\partial X[i]} =\frac{\partial L}{\partial Y[i]} Y[i](1-Y[i])
+$$
 ######Affine
 ・概要
-入力の配列に線形変換行列<img src="https://latex.codecogs.com/gif.latex?W"/>と<img src="https://latex.codecogs.com/gif.latex?B"/>を作用させた結果を出力する。
+入力の配列に線形変換行列$W$と$B$を作用させた結果を出力する。
 ・入出力要素数
-<img src="https://latex.codecogs.com/gif.latex?W"/>のサイズは(outputsize,inputsize)
-<img src="https://latex.codecogs.com/gif.latex?B"/>のサイズは(outputsize,1)
+$W$のサイズは(outputsize,inputsize)
+$B$のサイズは(outputsize,1)
 ・順伝播関数
-入力の配列を行列<img src="https://latex.codecogs.com/gif.latex?X"/>(inputsize,1)
-出力の配列を行列<img src="https://latex.codecogs.com/gif.latex?Y"/>(outputsize,1)
+入力の配列を行列$X$(inputsize,1)
+出力の配列を行列$Y$(outputsize,1)
 とする。
-<p align="center"><img src="https://latex.codecogs.com/gif.latex?Y=W\cdot%20X+B"/></p>  
-  
+$$
+Y=W\cdot X+B
+$$
 つまり
-<p align="center"><img src="https://latex.codecogs.com/gif.latex?Y[i,1]=\sum_j%20W[i,j]\cdot%20X[j,1]+B[i,1]"/></p>  
-  
+$$
+Y[i,1]=\sum_j W[i,j]\cdot X[j,1]+B[i,1]
+$$
 ・逆伝播関数
-<p align="center"><img src="https://latex.codecogs.com/gif.latex?\frac{\partial%20L}{\partial%20X[i]}=\sum_j\frac{\partial%20Y[j]}{\partial%20X[i]}\frac{\partial%20L}{\partial%20Y[j]}=\sum_j%20W[i,j]\cdot%20\frac{\partial%20L}{\partial%20Y[j]}"/></p>  
-また<p align="center"><img src="https://latex.codecogs.com/gif.latex?\begin{cases}\frac{\partial%20L}{\partial%20B[i]}%20&amp;=%20\frac{\partial%20L}{\partial%20Y[i]}%20\\\frac{\partial%20L}{\partial%20W[i,j]}%20&amp;=%20X[j]\cdot%20\frac{\partial%20L}{\partial%20Y[i]}\end{cases}"/></p>  
-  
+$$
+\frac{\partial L}{\partial X[i]}=\sum_j\frac{\partial Y[j]}{\partial X[i]}\frac{\partial L}{\partial Y[j]}=\sum_j W[i,j]\cdot \frac{\partial L}{\partial Y[j]}
+$$また$$
+\begin{cases}
+\frac{\partial L}{\partial B[i]} &= \frac{\partial L}{\partial Y[i]} \\
+\frac{\partial L}{\partial W[i,j]} &= X[j]\cdot \frac{\partial L}{\partial Y[i]}
+\end{cases}
+$$
 もしくは
-<p align="center"><img src="https://latex.codecogs.com/gif.latex?\frac{\partial%20L}{\partial%20X}=\frac{\partial%20L}{\partial%20Y}\cdot%20W^T"/></p>  
-  
-<p align="center"><img src="https://latex.codecogs.com/gif.latex?\frac{\partial%20L}{\partial%20W}=X^T\cdot\frac{\partial%20L}{\partial%20Y}"/></p>  
-  
-<p align="center"><img src="https://latex.codecogs.com/gif.latex?\frac{\partial%20L}{\partial%20B}=\frac{\partial%20L}{\partial%20Y}"/></p>  
-  
-  
+$$\frac{\partial L}{\partial X}=\frac{\partial L}{\partial Y}\cdot W^T$$
+$$\frac{\partial L}{\partial W}=X^T\cdot\frac{\partial L}{\partial Y}$$
+$$\frac{\partial L}{\partial B}=\frac{\partial L}{\partial Y}$$
+
 ######Softmax
 ・概要
 ・入出力要素数
 ・順伝播関数
 ・逆伝播関数
-  
+
 ######SoftmaxWithLoss
 ・概要
 入力配列にソフトマックスを作用させて正規化し、さらに出力配列と期待値配列を直行エントロピー損失関数をかけて計算する。
 ・入出力要素数
-<p align="center"><img src="https://latex.codecogs.com/gif.latex?\text{outputsize}=1"/></p>  
-  
+$$
+\text{outputsize}=1
+$$
 ・順伝播関数
-<img src="https://latex.codecogs.com/gif.latex?X[\text{inputsize}]\to%20Y[\text{inputsize}]%20\&amp;%20T[\text{inputsize}]\to%20L[1]"/>と計算を進める。(<img src="https://latex.codecogs.com/gif.latex?T"/>は期待値配列)
-<p align="center"><img src="https://latex.codecogs.com/gif.latex?Y[i]=\frac{\text{exp}(X[i])}{\sum_j%20\text{exp}(X[j])}"/></p>  
-  
-<p align="center"><img src="https://latex.codecogs.com/gif.latex?L=-\sum_i%20T[i]ln(Y[i])"/></p>  
-  
-  
+$X[\text{inputsize}]\to Y[\text{inputsize}] \& T[\text{inputsize}]\to L[1]$と計算を進める。($T$は期待値配列)
+$$Y[i]=\frac{\text{exp}(X[i])}{\sum_j \text{exp}(X[j])}$$
+$$L=-\sum_i T[i]ln(Y[i])$$
+
 ・逆伝播関数
-  
-<p align="center"><img src="https://latex.codecogs.com/gif.latex?\frac{\partial%20L}{\partial%20X[i]}=Y[i]-T[i]"/></p>  
-  
-  
+
+$$\frac{\partial L}{\partial X[i]}=Y[i]-T[i]$$
+
+
   
 #####機能
   
@@ -193,7 +204,7 @@ layerハンドラーの要素pLayerParamsを返す。
 
 ・エラー
 引数がNULL
-######void * PointerForwardOutput(H_LAYER hLayer)
+######H_MATRIX hMatrixForwardOutput(H_LAYER hLayer)
 ・概要
 layerハンドラーの要素pForwardOutputを返す。
 ・引数
@@ -201,14 +212,14 @@ layerハンドラーの要素pForwardOutputを返す。
 |-:|:-|:-|
 |H_LAYER|hLayer|対象のlayerのハンドラー|
   
-・戻り値void
-正常:pLayerParamsのポインタ
+・戻り値 H_MATRIX
+正常:順伝播計算の結果の行列のハンドラー
 異常:NULL
 
 ・エラー
 引数がNULL
 
-######void * PointerForwardOutput(H_LAYER hLayer)
+######H_MATRIX hMatrixForwardOutput(H_LAYER hLayer)
 ・概要
 layerハンドラーの要素pForwardOutputを返す。
 ・引数
@@ -216,8 +227,8 @@ layerハンドラーの要素pForwardOutputを返す。
 |-:|:-|:-|
 |H_LAYER|hLayer|対象のlayerのハンドラー|
   
-・戻り値void
-正常:pLayerParamsのポインタ
+・戻り値 H_MATRIX
+正常:逆伝播計算の結果の行列のハンドラー
 異常:NULL
 
 ・エラー

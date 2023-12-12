@@ -12,11 +12,11 @@ H_LAYER create_layer(int type, unsigned int input_size, unsigned int output_size
     switch (type)
     {
     // defined types
-    LT_ReLU:
-    LT_Sigmoid:
-    LT_Affine:
+    case LT_ReLU:
+    case LT_Sigmoid:
+    case LT_Affine:
         //	LT_Softmax :
-    LT_SoftmaxWithLoss:
+    case LT_SoftmaxWithLoss:
         break;
 
     default: // not defined type
@@ -30,6 +30,8 @@ H_LAYER create_layer(int type, unsigned int input_size, unsigned int output_size
     H_MATRIX hT = NULL;
     H_MATRIX hW = NULL;
     H_MATRIX hB = NULL;
+    H_MATRIX hForword=NULL;
+    H_MATRIX hBackword=NULL;
     H_MATRIX *pParam = NULL;
     S_LAYER *pLayer = (S_LAYER *)malloc(sizeof(S_LAYER));
 
@@ -48,14 +50,6 @@ H_LAYER create_layer(int type, unsigned int input_size, unsigned int output_size
         if (pLayer->input_size == pLayer->output_size)
         {
             pLayer->pLayerParam = NULL;
-            pLayer->pBackwardOutput = (void *)malloc(sizeof(double) * pLayer->input_size);
-            pLayer->pForwardOutput = (void *)malloc(sizeof(double) * pLayer->output_size);
-            // NULL check
-            if (pLayer->pBackwardOutput == NULL || pLayer->pForwardOutput == NULL)
-            {
-                free(pLayer->pBackwardOutput);
-                free(pLayer->pBackwardOutput);
-            }
         }
         else
         {
@@ -66,14 +60,6 @@ H_LAYER create_layer(int type, unsigned int input_size, unsigned int output_size
         if (pLayer->input_size == pLayer->output_size)
         {
             pLayer->pLayerParam = NULL;
-            pLayer->pBackwardOutput = (void *)malloc(sizeof(double) * pLayer->input_size);
-            pLayer->pForwardOutput = (void *)malloc(sizeof(double) * pLayer->output_size);
-            // NULL check
-            if (pLayer->pBackwardOutput == NULL || pLayer->pForwardOutput == NULL)
-            {
-                free(pLayer->pBackwardOutput);
-                free(pLayer->pBackwardOutput);
-            }
         }
         else
         {
@@ -132,6 +118,20 @@ H_LAYER create_layer(int type, unsigned int input_size, unsigned int output_size
         }
         break;
     }
+
+    if (error != 0)
+    {
+        pLayer->hBackwardOutput = create_matrix(input_size,1);
+        pLayer->hForwardOutput = create_matrix(output_size,1);
+        // NULL check
+        if (pLayer->hBackwardOutput == NULL || pLayer->hBackwardOutput == NULL)
+        {
+            delete_matrix(pLayer->hBackwardOutput);
+            delete_matrix(pLayer->hForwardOutput);  
+            error = 6;
+        }
+    }
+
     if (error != 0)
     {
         free(pLayer);
@@ -184,8 +184,8 @@ int delete_layer(H_LAYER hLayer)
     default:
         break;
     }
-    free(pLayer->pBackwardOutput);
-    free(pLayer->pForwardOutput);
+    delete_matrix(pLayer->hBackwardOutput);
+    delete_matrix(pLayer->hForwardOutput);
     free(pLayer);
 
     return 0;
@@ -201,7 +201,7 @@ void *PointerLayerParameters(H_LAYER hLayer)
     S_LAYER *pLayer = (S_LAYER *)hLayer;
     return pLayer->pLayerParam;
 }
-void *PointerForwardOutput(H_LAYER hLayer)
+H_MATRIX PointerForwardOutput(H_LAYER hLayer)
 {
     // NULL CEHCK
     if (hLayer == NULL)
@@ -209,9 +209,9 @@ void *PointerForwardOutput(H_LAYER hLayer)
         return NULL;
     }
     S_LAYER *pLayer = (S_LAYER *)hLayer;
-    return pLayer->pForwardOutput;
+    return pLayer->hForwardOutput;
 }
-void *PointerBackwardOutput(H_LAYER hLayer)
+H_MATRIX PointerBackwardOutput(H_LAYER hLayer)
 {
     // NULL CEHCK
     if (hLayer == NULL)
@@ -219,7 +219,7 @@ void *PointerBackwardOutput(H_LAYER hLayer)
         return NULL;
     }
     S_LAYER *pLayer = (S_LAYER *)hLayer;
-    return pLayer->pBackwardOutput;
+    return pLayer->hBackwardOutput;
 }
 int calc_forword(H_LAYER hLayer, double *vInput);
 int calc_backword(H_LAYER hLayer, double *vInput);
