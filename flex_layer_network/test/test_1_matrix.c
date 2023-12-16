@@ -8,29 +8,34 @@ int test_1_delete_matrix(void);
 int test_1_add_matrix(void);
 int test_1_product_matrix(void);
 int test_1_print_matrix(void);
+int test_1_copy_matrix(void);
 
 int main(void)
 {
     srand((unsigned int)time(NULL));
     int ret = 0;
-    if (ret = test_1_create_matrix() != 0)
+    if (test_1_create_matrix() != 0)
     {
         printf("TEST NG in : test_1_create_matrix\n");
         printf("ERROR CODE : %d\n", ret);
     }
-    if (ret = test_1_delete_matrix() != 0)
+    if (test_1_delete_matrix() != 0)
     {
         printf("TEST NG in : test_1_delete_matrix\n");
     }
-    if (ret = test_1_add_matrix() != 0)
+    if ( test_1_add_matrix() != 0)
     {
         printf("TEST NG in : test_1_add_matrix\n");
     }
-    if (ret = test_1_product_matrix() != 0)
+    if ( test_1_product_matrix() != 0)
     {
         printf("TEST NG in : test_1_product_matrix\n");
     }
-    if (ret = test_1_print_matrix() != 0)
+    if ( test_1_print_matrix() != 0)
+    {
+        printf("TEST NG in : test_1_print_matrix\n");
+    }
+    if ( test_1_copy_matrix() != 0)
     {
         printf("TEST NG in : test_1_print_matrix\n");
     }
@@ -177,4 +182,64 @@ int test_1_product_matrix(void)
 int test_1_print_matrix(void)
 {
     return 0;
+}
+
+int test_1_copy_matrix(void)
+{
+    H_MATRIX hMatIN = NULL;
+    H_MATRIX hMatOUT = NULL;
+    S_MATRIX *pMatIN = NULL;
+    S_MATRIX *pMatOUT = NULL;
+    pMatIN = (S_MATRIX *)hMatIN;
+    pMatOUT = (S_MATRIX *)hMatOUT;
+    int ret = 0;
+    int result = 0;
+
+    //(1)collect copy
+    hMatIN = create_matrix(2, 3);
+    hMatOUT = create_matrix(2, 3);
+    for (int i = 0; i < 6; i++)
+    {
+        pMatIN->pElem[i] = (double)i;
+    }
+    ret = copy_matrix(hMatIN, hMatOUT);
+    if (ret == 0)
+    {
+        for (int i = 0; i < 6; i++)
+        {
+            if (pMatOUT->pElem[i] != (double)i)
+            {
+                ret += 1;
+                break;
+            }
+        }
+    }
+    if (ret != 0)
+    {
+        result += 0x1;
+    }
+    delete_matrix(hMatIN);
+    delete_matrix(hMatOUT);
+
+    //(2)size failure
+
+    hMatIN = create_matrix(2, 3);
+    hMatOUT = create_matrix(3, 3);
+    ret = copy_matrix(hMatIN, hMatOUT);
+    if (ret == 0)
+    {
+        result += 0x2;
+    }
+    delete_matrix(hMatIN);
+    delete_matrix(hMatOUT);
+
+    //(3)pointer failure
+    hMatIN = create_matrix(2, 3);
+    ret = copy_matrix(hMatIN, NULL);
+    if (ret == 0)
+    {
+        result += 0x4;
+    }
+    delete_matrix(hMatIN);
+    return result;
 }

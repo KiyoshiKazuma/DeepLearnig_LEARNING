@@ -23,6 +23,9 @@ H_MATRIX create_matrix(unsigned int row_size, unsigned int column_size)
     hMatrix->size = row_size * column_size;
     double *vec = (double *)malloc(sizeof(double) * hMatrix->size);
     hMatrix->pElem = vec;
+    for(int i=0;i<hMatrix->size;i++){
+        vec[i]=0.0;
+    }
 
     return hMatrix;
 }
@@ -160,3 +163,25 @@ int print_matrix(H_MATRIX hMatrix)
     }
 }
 
+
+int copy_matrix(H_MATRIX hMatix_IN,H_MATRIX hMatix_OUT){
+    //NULL CHECK
+    if(hMatix_IN==NULL || hMatix_OUT==NULL){
+        return 1;
+    }
+    S_MATRIX * pMatrix_IN = NULL;
+    S_MATRIX * pMatrix_OUT = NULL;
+    pMatrix_IN=(S_MATRIX *)hMatix_IN;
+    pMatrix_OUT=(S_MATRIX *)hMatix_OUT;
+
+    //SIZE CHECK
+    if(pMatrix_IN->row!=pMatrix_OUT->row || pMatrix_IN->column!=pMatrix_OUT->column){
+        return 1;
+    }
+
+    //copy elements
+    for(int i=0;i<pMatrix_IN->size;i++){
+        pMatrix_OUT->pElem[i]=pMatrix_IN->pElem[i];
+    }
+    return 0;
+}
