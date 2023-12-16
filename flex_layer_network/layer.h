@@ -28,6 +28,6 @@ int print_layer(H_LAYER hLayer);
 void * PointerLayerParameters(H_LAYER hLayer);
 H_MATRIX PointerForwardOutput(H_LAYER hLayer);
 H_MATRIX PointerBackwardOutput(H_LAYER hLayer);
-int calc_forword(H_LAYER hLayer,double * vInput);
-int calc_backword(H_LAYER hLayer,double * vInput);
+int calc_forword(H_LAYER hLayer,H_MATRIX hMatrix);
+int calc_backword(H_LAYER hLayer,H_MATRIX hMatrix);
 #endif //D_LAYER

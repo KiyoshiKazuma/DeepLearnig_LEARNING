@@ -1,6 +1,13 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <math.h>
 #include "layer.h"
+
+double calc_sigmoid(double x){
+    double y=0;
+    y=1.0/(1.0+exp(x));
+    return y;
+}
 
 H_LAYER create_layer(int type, unsigned int input_size, unsigned int output_size)
 {
@@ -30,8 +37,8 @@ H_LAYER create_layer(int type, unsigned int input_size, unsigned int output_size
     H_MATRIX hT = NULL;
     H_MATRIX hW = NULL;
     H_MATRIX hB = NULL;
-    H_MATRIX hForword=NULL;
-    H_MATRIX hBackword=NULL;
+    H_MATRIX hForword = NULL;
+    H_MATRIX hBackword = NULL;
     H_MATRIX *pParam = NULL;
     S_LAYER *pLayer = (S_LAYER *)malloc(sizeof(S_LAYER));
 
@@ -121,13 +128,13 @@ H_LAYER create_layer(int type, unsigned int input_size, unsigned int output_size
 
     if (error != 0)
     {
-        pLayer->hBackwardOutput = create_matrix(input_size,1);
-        pLayer->hForwardOutput = create_matrix(output_size,1);
+        pLayer->hBackwardOutput = create_matrix(input_size, 1);
+        pLayer->hForwardOutput = create_matrix(output_size, 1);
         // NULL check
         if (pLayer->hBackwardOutput == NULL || pLayer->hBackwardOutput == NULL)
         {
             delete_matrix(pLayer->hBackwardOutput);
-            delete_matrix(pLayer->hForwardOutput);  
+            delete_matrix(pLayer->hForwardOutput);
             error = 6;
         }
     }
@@ -221,6 +228,67 @@ H_MATRIX PointerBackwardOutput(H_LAYER hLayer)
     S_LAYER *pLayer = (S_LAYER *)hLayer;
     return pLayer->hBackwardOutput;
 }
-int calc_forword(H_LAYER hLayer, double *vInput);
-int calc_backword(H_LAYER hLayer, double *vInput);
-int update_params(H_LAYER hlayer);
+
+int calc_forword(H_LAYER hLayer, H_MATRIX hMatrix)
+{
+    if (hLayer == NULL || hMatrix == NULL)
+    {
+        return 1;
+    }
+    S_LAYER *pLayer = NULL;
+    S_MATRIX *pMatrixInput = NULL;
+    S_MATRIX *pMatrixOutput = NULL;
+    H_MATRIX W=NULL;
+    H_MATRIX B=NULL;
+    H_MATRIX Y=NULL; 
+    H_MATRIX * pParam=NULL;
+
+    pLayer = (S_LAYER *)hLayer;
+    pMatrixOutput = (S_MATRIX *)pLayer->hForwardOutput;
+    pMatrixInput = (S_MATRIX *)hMatrix;
+
+    if (pMatrixInput->row != pLayer->input_size || pMatrixInput->column != 1 || pMatrixOutput->row != pLayer->output_size || pMatrixOutput->column != 1)
+    {
+        return 1;
+    }
+
+    switch (pLayer->type)
+    {
+    case LT_ReLU:
+        for (unsigned int i = 0; i < pLayer->input_size; i++)
+        {
+            if (pMatrixInput->pElem[i] > 0)
+            {
+                pMatrixOutput->pElem[i] = pMatrixInput->pElem[i];
+            }
+            else
+            {
+                pMatrixOutput->pElem[i] = 0;
+            }
+        }
+        break;
+    case LT_Sigmoid:
+        for (unsigned int i = 0; i < pLayer->input_size; i++)
+        {
+            pMatrixOutput->pElem[i] = calc_sigmoid(pMatrixInput->pElem[i]);
+        }
+        break;
+
+    case LT_Affine:
+        pParam=(H_MATRIX *)pLayer->pLayerParam;
+        W=pParam[0];
+        B=pParam[1];
+
+    case LT_SoftmaxWithLoss:
+        pParam=(H_MATRIX *)pLayer->pLayerParam;
+        Y=pParam[0];
+
+    default:
+    }
+
+    return 0;
+}
+int calc_backword(H_LAYER hLayer, H_MATRIX hMatrix)
+{
+    return 0;
+}

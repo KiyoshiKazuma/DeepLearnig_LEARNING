@@ -41,9 +41,9 @@
 |:-|:-|
 |LT_ReLU|NULL|
 |LT_Sigmoid|NULL|
-|LT_Affine|void *pAffineParams[2]={pW,pB}(ポインタ配列)|
+|LT_Affine|void *pAffineParams[2]={hW,hB}(ポインタ配列)|
 |LT_Softmax|NULL|
-|LT_SoftmaxWithLoss|void * pSWLParams[2]={pY,pT}(ポインタ配列)|
+|LT_SoftmaxWithLoss|void * pSWLParams[2]={hY,hT}(ポインタ配列)|
   
 #####各Layer設計
 ######ReLU
@@ -242,7 +242,7 @@ layerに順伝播の入力値を渡し、計算結果(pForwardOutput)を更新�
 |型|引数名|概要|
 |-:|:-|:-|
 |H_LAYER|hLayer|出力対象のlayerのハンドラー|
-|double *|vInput|入力値の配列|
+|H_MATRIX|hMatrix|入力値の配列|
   
 ・戻り値int
 正常:0
@@ -259,7 +259,7 @@ layerに誤差逆伝播の入力値を渡し、計算結果(pBackwardOutput)を�
 |型|引数名|概要|
 |-:|:-|:-|
 |H_LAYER|hLayer|出力対象のlayerのハンドラー|
-|double *|vInput|入力値の配列|
+|H_MATRIX|hMatrix|入力値の配列|
   
 ・戻り値int
 正常:0
@@ -268,18 +268,6 @@ layerに誤差逆伝播の入力値を渡し、計算結果(pBackwardOutput)を�
 ・エラー判定
 引数が１つ以上NULL
 計算エラー
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
   
   
   

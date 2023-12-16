@@ -325,7 +325,34 @@ int test_2_PointerForwardOutput()
 }
 int test_2_PointerBackwardOutput()
 {
-    return 0;
+    int result = 0;
+    int ret = 0;
+    void *pParam = NULL;
+    H_LAYER hLayer = NULL;
+
+    for (int i = 0; test[i].type != -1; i++)
+    {
+        pParam=NULL;
+        hLayer = create_layer(test[i].type, test[i].input_size, test[i].output_size);
+        pParam = PointerBackwardOutput(hLayer);
+        if (test[i].exp_create == 0)
+        {
+            if (pParam == NULL)
+            {
+                test[i].result |= 0x20;
+                result = 1;
+            }
+        }
+        else
+        {
+            if (pParam != NULL)
+            {
+                test[i].result |= 0x20;
+                result = 1;
+            }
+        }
+    }
+    return result;
 }
 
 int test_2_calc_forword(void)

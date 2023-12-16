@@ -173,7 +173,7 @@
 </tr>
 <tr>
 <td style="text-align:left">LT_Affine</td>
-<td style="text-align:left">void *pAffineParams[2]={pW,pB}(ポインタ配列)</td>
+<td style="text-align:left">void *pAffineParams[2]={hW,hB}(ポインタ配列)</td>
 </tr>
 <tr>
 <td style="text-align:left">LT_Softmax</td>
@@ -181,7 +181,7 @@
 </tr>
 <tr>
 <td style="text-align:left">LT_SoftmaxWithLoss</td>
-<td style="text-align:left">void * pSWLParams[2]={pY,pT}(ポインタ配列)</td>
+<td style="text-align:left">void * pSWLParams[2]={hY,hT}(ポインタ配列)</td>
 </tr>
 </tbody>
 </table>
@@ -436,8 +436,8 @@ layerに順伝播の入力値を渡し、計算結果(pForwardOutput)を更新�
 <td style="text-align:left">出力対象のlayerのハンドラー</td>
 </tr>
 <tr>
-<td style="text-align:right">double *</td>
-<td style="text-align:left">vInput</td>
+<td style="text-align:right">H_MATRIX</td>
+<td style="text-align:left">hMatrix</td>
 <td style="text-align:left">入力値の配列</td>
 </tr>
 </tbody>
@@ -467,8 +467,8 @@ layerに誤差逆伝播の入力値を渡し、計算結果(pBackwardOutput)を�
 <td style="text-align:left">出力対象のlayerのハンドラー</td>
 </tr>
 <tr>
-<td style="text-align:right">double *</td>
-<td style="text-align:left">vInput</td>
+<td style="text-align:right">H_MATRIX</td>
+<td style="text-align:left">hMatrix</td>
 <td style="text-align:left">入力値の配列</td>
 </tr>
 </tbody>
