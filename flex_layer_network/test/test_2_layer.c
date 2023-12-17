@@ -36,6 +36,7 @@ S_test_case test[] = {
     // end marker
 };
 
+
 int test_2_create_layer(void);
 int test_2_delete_layer(void);
 int test_2_print_layer(void);
@@ -357,6 +358,7 @@ int test_2_PointerBackwardOutput()
 
 int test_2_calc_forword(void)
 {
+    
     return 0;
 }
 int test_2_calc_backword(void)

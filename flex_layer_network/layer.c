@@ -3,9 +3,10 @@
 #include <math.h>
 #include "layer.h"
 
-double calc_sigmoid(double x){
-    double y=0;
-    y=1.0/(1.0+exp(x));
+double calc_sigmoid(double x)
+{
+    double y = 0;
+    y = 1.0 / (1.0 + exp(x));
     return y;
 }
 
@@ -235,14 +236,15 @@ int calc_forword(H_LAYER hLayer, H_MATRIX hMatrix)
     {
         return 1;
     }
-    int ret=0;
+    int ret = 0;
     S_LAYER *pLayer = NULL;
     S_MATRIX *pMatrixInput = NULL;
     S_MATRIX *pMatrixOutput = NULL;
-    H_MATRIX W=NULL;
-    H_MATRIX B=NULL;
-    H_MATRIX Y=NULL; 
-    H_MATRIX * pParam=NULL;
+    H_MATRIX W = NULL;
+    H_MATRIX B = NULL;
+    S_MATRIX *Y = NULL;
+    S_MATRIX *T = NULL;
+    H_MATRIX *pParam = NULL;
 
     pLayer = (S_LAYER *)hLayer;
     pMatrixOutput = (S_MATRIX *)pLayer->hForwardOutput;
@@ -276,27 +278,51 @@ int calc_forword(H_LAYER hLayer, H_MATRIX hMatrix)
         break;
 
     case LT_Affine:
-        ret=0;
-        pParam=(H_MATRIX *)pLayer->pLayerParam;
-        W=pParam[0];
-        B=pParam[1];
-        H_MATRIX hOutput1=NULL;
-        H_MATRIX hOutput2=NULL;
-        hOutput1=create_matrix(pLayer->output_size,1);
-        hOutput2=create_matrix(pLayer->output_size,1);
-        
-        ret+=product_matrix(W,hMatrix,hOutput1);
-        ret+=add_matrix(hOutput1,B,hOutput2);
-        
-        if(ret==0){
-            
+        ret = 0;
+        pParam = (H_MATRIX *)pLayer->pLayerParam;
+        W = pParam[0];
+        B = pParam[1];
+        H_MATRIX hOutput1 = NULL;
+        H_MATRIX hOutput2 = NULL;
+        hOutput1 = create_matrix(pLayer->output_size, 1);
+        hOutput2 = create_matrix(pLayer->output_size, 1);
+
+        ret += product_matrix(W, hMatrix, hOutput1);
+        ret += add_matrix(hOutput1, B, hOutput2);
+
+        if (ret == 0)
+        {
+            ret += copy_matrix(hOutput2, (void *)pMatrixOutput);
+        }
+        delete_matrix(hOutput1);
+        delete_matrix(hOutput2);
+        break;
+    case LT_SoftmaxWithLoss:
+        pParam = (H_MATRIX *)pLayer->pLayerParam;
+        Y = (S_MATRIX *)pParam[0];
+        T = (S_MATRIX *)pParam[1];
+        S_MATRIX *pOutput = NULL;
+        pOutput = (S_MATRIX *)create_matrix(pLayer->input_size, 1);
+        double exp_sum = 0;
+        double L = 0;
+        for (int i = 0; i < pOutput->size; i++)
+        {
+            exp_sum += exp(pMatrixInput->pElem[i]);
+        }
+        for (int i = 0; i < pOutput->size; i++)
+        {
+            Y->pElem[i] = exp(pMatrixInput->pElem[i]) / exp_sum;
         }
 
-    case LT_SoftmaxWithLoss:
-        pParam=(H_MATRIX *)pLayer->pLayerParam;
-        Y=pParam[0];
-
+        for (int i = 0; i < pOutput->size; i++)
+        {
+            L -= T->pElem[i] * log(Y->pElem[i]);
+        }
+        pMatrixOutput->pElem[0] = L;
+        delete_matrix((void *)pOutput);
+        break;
     default:
+        break;
     }
 
     return 0;
