@@ -14,7 +14,6 @@ typedef struct
     // テスト結果
     int result;
 } S_test_case;
-
 S_test_case test[] = {
     LT_ReLU, 2, 2, 0, 0,
     LT_ReLU, 2, 0, 1, 0,
@@ -36,7 +35,6 @@ S_test_case test[] = {
     // end marker
 };
 
-
 int test_2_create_layer(void);
 int test_2_delete_layer(void);
 int test_2_print_layer(void);
@@ -50,6 +48,7 @@ int main(void)
 {
     int ret = 0;
 
+    printf("RUNNING : test_2_create_layer\n");
     ret = test_2_create_layer();
     if (ret != 0)
     {
@@ -63,6 +62,7 @@ int main(void)
         }
     }
 
+    printf("RUNNING : test_2_delete_layer\n");
     ret = test_2_delete_layer();
     if (ret != 0)
     {
@@ -76,6 +76,7 @@ int main(void)
         }
     }
 
+    printf("RUNNING : test_2_print_layer\n");
     ret = test_2_print_layer();
     if (ret != 0)
     {
@@ -89,6 +90,8 @@ int main(void)
         }
     }
 
+    
+    printf("RUNNING : test_2_PointerLayerParameters\n");
     ret = test_2_PointerLayerParameters();
     if (ret != 0)
     {
@@ -102,6 +105,7 @@ int main(void)
         }
     }
 
+    printf("RUNNING : test_2_PointerForwardOutput\n");
     ret = test_2_PointerForwardOutput();
     if (ret != 0)
     {
@@ -115,12 +119,15 @@ int main(void)
         }
     }
 
+
+    printf("RUNNING : test_2_PointerBackwardOutput\n");
     ret = test_2_PointerBackwardOutput();
     if (ret != 0)
     {
         printf("error : test_2_PointerBackwardOutput  \n error id : %d\n , ret");
     }
 
+    printf("RUNNING : test_2_calc_forword\n");
     ret = test_2_calc_forword();
     if (ret != 0)
     {
@@ -302,7 +309,7 @@ int test_2_PointerForwardOutput()
 
     for (int i = 0; test[i].type != -1; i++)
     {
-        pParam=NULL;
+        pParam = NULL;
         hLayer = create_layer(test[i].type, test[i].input_size, test[i].output_size);
         pParam = PointerForwardOutput(hLayer);
         if (test[i].exp_create == 0)
@@ -333,7 +340,7 @@ int test_2_PointerBackwardOutput()
 
     for (int i = 0; test[i].type != -1; i++)
     {
-        pParam=NULL;
+        pParam = NULL;
         hLayer = create_layer(test[i].type, test[i].input_size, test[i].output_size);
         pParam = PointerBackwardOutput(hLayer);
         if (test[i].exp_create == 0)
@@ -358,8 +365,168 @@ int test_2_PointerBackwardOutput()
 
 int test_2_calc_forword(void)
 {
+    int result = 0;
+    int ret = 0;
+    H_LAYER hLayer = NULL;
+    H_MATRIX hInput = NULL;
+    H_MATRIX hOutput = NULL;
+    H_MATRIX hW = NULL;
+    H_MATRIX hB = NULL;
+    S_LAYER *pLayer = NULL;
+    S_MATRIX *pInput = NULL;
+    S_MATRIX *pOutput = NULL;
+    S_MATRIX *pW = NULL;
+    S_MATRIX *pB = NULL;
+    H_MATRIX * vLayerParams = NULL;
+
+    //(1) ReLu collect
+    double input_1[3] = {-1.0, 0.0, 1.0};
+    double exp_1[3] = {0.0, 0.0, 1.0};
+    hLayer = create_layer(LT_ReLU, 3, 3);
+    hOutput = PointerForwardOutput(hLayer);
+    hInput = create_matrix(3, 1);
+    pLayer = (S_MATRIX *)hLayer;
+    pOutput = (S_MATRIX *)hOutput;
+    pInput = (S_MATRIX *)hInput;
+    for (int i = 0; i < 3; i++)
+    {
+        pInput->pElem[i] = input_1[i];
+    }
+    ret = calc_forword(hLayer, hInput);
+    if (ret == 0)
+    {
+        // compare output data and exp data
+        for (int i = 0; i < 3; i++)
+        {
+            double diff = pOutput->pElem[i] - exp_1[i];
+            if (diff > 0.01 || diff < -0.01)
+            {
+                ret = 1;
+                break;
+            }
+        }
+    }
+    if (ret != 0)
+    {
+        result += 0x1;
+    }
+    printf("test_2_calc_forword : (1) result\n");
+    printf("\texp \t: ");
+    for(int i =0;i<3;i++)printf("  %f  ",exp_1[i]);
+    printf("\n\toutput \t");
+    for(int i =0;i<3;i++)printf("  %f  ",pOutput->pElem[i]);
+    printf("\n");
+
+    delete_layer(hLayer);
+    delete_matrix(hInput);
+
+    //(2) Sigmoid collect
+    double input_2[3] = {-1.0, 0.0, 1.0};
+    double exp_2[3] = {0.2689, 0.5, 0.7310};
+    hLayer = NULL;
+    hInput = NULL;
+    hOutput = NULL;
+    pLayer = NULL;
+    pInput = NULL;
+    pOutput = NULL;
+
+    hLayer = create_layer(LT_Sigmoid, 3, 3);
+    hInput = create_matrix(3, 1);
+    hOutput = PointerForwardOutput(hLayer);
+    pLayer = (S_LAYER *)hLayer;
+    pInput = (S_MATRIX *)hInput;
+    pOutput = (S_MATRIX *)hOutput;
+
+    for (int i = 0; i < 3; i++)
+    {
+        pInput->pElem[i] = input_2[i];
+    }
+
+    ret = calc_forword(hLayer, hInput);
+    if (ret == 0)
+    {
+        // compare output data and exp data
+        for (int i = 0; i < 3; i++)
+        {
+            double diff = pOutput->pElem[i] - exp_2[i];
+            if (diff > 0.01 || diff < -0.01)
+            {
+                ret = 1;
+                break;
+            }
+        }
+    }
+    if (ret != 0)
+    {
+        result += 0x2;
+    }
+    delete_layer(hLayer);
+    delete_matrix(hInput);
+
+    //(3)Affine Collect
     
-    return 0;
+    double input_3[3] = {-1.0, 0.0, 1.0};
+    double exp_3[2] = {9.0,10.0};
+    double W_3[6] ={1,2,3,4,5,6};
+    double B_3[2] ={7,8};
+    
+    hLayer = NULL;
+    hInput = NULL;
+    hOutput = NULL;
+    hW = NULL;
+    hB = NULL;
+    pLayer = NULL;
+    pInput = NULL;
+    pOutput = NULL;
+    pW = NULL;
+    pB = NULL;
+    
+    
+    hLayer = create_layer(LT_Affine, 3, 2);
+    hInput = create_matrix(3, 1);
+    hOutput = PointerForwardOutput(hLayer);
+    pLayer = (S_LAYER *)hLayer;
+    pInput = (S_MATRIX *)hInput;
+    pOutput = (S_MATRIX *)hOutput;
+    vLayerParams=(H_MATRIX *)PointerLayerParameters(hLayer);
+    hW=vLayerParams[0];
+    hB=vLayerParams[1];
+    pW=(S_MATRIX*)hW;
+    pB=(S_MATRIX*)hB;
+    for(int i=0;i<6;i++){
+        pW->pElem[i]=W_3[i];
+    }
+    for(int i=0;i<2;i++){
+        pB->pElem[i]=B_3[i];
+    }
+
+    for (int i = 0; i < 3; i++)
+    {
+        pInput->pElem[i] = input_3[i];
+    }
+
+    ret = calc_forword(hLayer, hInput);
+    if (ret == 0)
+    {
+        // compare output data and exp data
+        for (int i = 0; i < 2; i++)
+        {
+            double diff = pOutput->pElem[i] - exp_3[i];
+            if (diff > 0.01 || diff < -0.01)
+            {
+                ret = 1;
+                break;
+            }
+        }
+    }
+    if (ret != 0)
+    {
+        result += 0x4;
+    }
+    delete_layer(hLayer);
+    delete_matrix(hInput);
+
+    return result;
 }
 int test_2_calc_backword(void)
 {

@@ -22,11 +22,14 @@ H_MATRIX create_matrix(unsigned int row_size, unsigned int column_size)
     hMatrix->row = row_size;
     hMatrix->size = row_size * column_size;
     double *vec = (double *)malloc(sizeof(double) * hMatrix->size);
+    if(vec==NULL){
+        free(hMatrix);
+        return NULL;
+    }
     hMatrix->pElem = vec;
     for(int i=0;i<hMatrix->size;i++){
         vec[i]=0.0;
     }
-
     return hMatrix;
 }
 

@@ -55,14 +55,12 @@ H_LAYER create_layer(int type, unsigned int input_size, unsigned int output_size
     switch (pLayer->type)
     {
     case LT_ReLU:
-        if (pLayer->input_size == pLayer->output_size)
-        {
-            pLayer->pLayerParam = NULL;
-        }
-        else
+        if (pLayer->input_size != pLayer->output_size)
         {
             error = 1;
         }
+        pLayer->pLayerParam = NULL;
+
         break;
     case LT_Sigmoid:
         if (pLayer->input_size == pLayer->output_size)
@@ -182,6 +180,7 @@ int delete_layer(H_LAYER hLayer)
         delete_matrix((H_MATRIX)pParam[0]);
         delete_matrix((H_MATRIX)pParam[1]);
         free(pParam);
+
         break;
     case LT_SoftmaxWithLoss:
         pParam = pLayer->pLayerParam;
@@ -192,6 +191,7 @@ int delete_layer(H_LAYER hLayer)
     default:
         break;
     }
+
     delete_matrix(pLayer->hBackwardOutput);
     delete_matrix(pLayer->hForwardOutput);
     free(pLayer);

@@ -23,19 +23,19 @@ int main(void)
     {
         printf("TEST NG in : test_1_delete_matrix\n");
     }
-    if ( test_1_add_matrix() != 0)
+    if (test_1_add_matrix() != 0)
     {
         printf("TEST NG in : test_1_add_matrix\n");
     }
-    if ( test_1_product_matrix() != 0)
+    if (test_1_product_matrix() != 0)
     {
         printf("TEST NG in : test_1_product_matrix\n");
     }
-    if ( test_1_print_matrix() != 0)
+    if (test_1_print_matrix() != 0)
     {
         printf("TEST NG in : test_1_print_matrix\n");
     }
-    if ( test_1_copy_matrix() != 0)
+    if (test_1_copy_matrix() != 0)
     {
         printf("TEST NG in : test_1_print_matrix\n");
     }
@@ -44,6 +44,7 @@ int main(void)
 int test_1_create_matrix(void)
 {
     H_MATRIX hMatrix = NULL;
+    int ret=0;
     unsigned int row = rand() % 10 + 1;
     unsigned int column = rand() % 10 + 1;
     unsigned int size = row * column;
@@ -71,6 +72,12 @@ int test_1_create_matrix(void)
     if (pMatrix->pElem == NULL)
     {
         return 4;
+    }
+
+    //DELETE MATRIX
+    ret=delete_matrix(hMatrix);
+    if(ret!=0){
+        return 5;
     }
     return 0;
 }
@@ -190,14 +197,15 @@ int test_1_copy_matrix(void)
     H_MATRIX hMatOUT = NULL;
     S_MATRIX *pMatIN = NULL;
     S_MATRIX *pMatOUT = NULL;
-    pMatIN = (S_MATRIX *)hMatIN;
-    pMatOUT = (S_MATRIX *)hMatOUT;
+
     int ret = 0;
     int result = 0;
 
     //(1)collect copy
     hMatIN = create_matrix(2, 3);
     hMatOUT = create_matrix(2, 3);
+    pMatIN = (S_MATRIX *)hMatIN;
+    pMatOUT = (S_MATRIX *)hMatOUT;
     for (int i = 0; i < 6; i++)
     {
         pMatIN->pElem[i] = (double)i;
@@ -225,6 +233,8 @@ int test_1_copy_matrix(void)
 
     hMatIN = create_matrix(2, 3);
     hMatOUT = create_matrix(3, 3);
+    pMatIN = (S_MATRIX *)hMatIN;
+    pMatOUT = (S_MATRIX *)hMatOUT;
     ret = copy_matrix(hMatIN, hMatOUT);
     if (ret == 0)
     {
@@ -235,6 +245,7 @@ int test_1_copy_matrix(void)
 
     //(3)pointer failure
     hMatIN = create_matrix(2, 3);
+    pMatIN = (S_MATRIX *)hMatIN;
     ret = copy_matrix(hMatIN, NULL);
     if (ret == 0)
     {
