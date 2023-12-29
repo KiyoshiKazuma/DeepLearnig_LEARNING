@@ -3,6 +3,15 @@
 #include <time.h>
 #include "../layer.h"
 
+#define D_TEST_CREATE_LAYER
+#define D_TEST_DELETE_LAYER
+// #define D_TEST_PRINT_LAYER
+#define D_TEST_P2_LAYER_PARAMS
+#define D_TEST_P2_FORWARD_OUTPUT
+#define D_TEST_P2_BACKWARD_OUTPUT
+// #define D_TEST_CALC_FORWARD
+// #define D_TEST_CAL_BACKWARD
+
 typedef struct
 {
     // 入力値情報
@@ -48,7 +57,9 @@ int main(void)
 {
     int ret = 0;
 
-   printf("RUNNING : test_2_create_layer\n");
+#ifdef D_TEST_CREATE_LAYER
+    printf("RUNNING : test_2_create_layer\n");
+    ret = 0;
     ret = test_2_create_layer();
     if (ret != 0)
     {
@@ -61,8 +72,11 @@ int main(void)
             }
         }
     }
+#endif // D_TEST_CREATE_LAYER
 
+#ifdef D_TEST_DELETE_LAYER
     printf("RUNNING : test_2_delete_layer\n");
+    ret = 0;
     ret = test_2_delete_layer();
     if (ret != 0)
     {
@@ -75,8 +89,11 @@ int main(void)
             }
         }
     }
+#endif // D_TEST_DELETE_LAYER
 
+#ifdef D_TEST_PRINT_LAYER
     printf("RUNNING : test_2_print_layer\n");
+    ret = 0;
     ret = test_2_print_layer();
     if (ret != 0)
     {
@@ -89,7 +106,9 @@ int main(void)
             }
         }
     }
+#endif // D_TEST_PRINT_LAYER
 
+#ifdef D_TEST_P2_LAYER_PARAMS
     printf("RUNNING : test_2_PointerLayerParameters\n");
     ret = test_2_PointerLayerParameters();
     if (ret != 0)
@@ -103,7 +122,9 @@ int main(void)
             }
         }
     }
+#endif // D_TEST_P2_LAYER_PARAMS
 
+#ifdef D_TEST_P2_FORWARD_OUTPUT
     printf("RUNNING : test_2_PointerForwardOutput\n");
     ret = test_2_PointerForwardOutput();
     if (ret != 0)
@@ -117,26 +138,33 @@ int main(void)
             }
         }
     }
+#endif // D_TEST_P2_FORWARD_OUTPUT
 
+#ifdef D_TEST_P2_BACKWARD_OUTPUT
     printf("RUNNING : test_2_PointerBackwardOutput\n");
     ret = test_2_PointerBackwardOutput();
     if (ret != 0)
     {
         printf("error : test_2_PointerBackwardOutput  \n error id : %d\n , ret");
     }
+#endif // D_TEST_P2_BACKWARD_OUTPUT
 
+#ifdef D_TEST_CALC_FORWARD
     printf("RUNNING : test_2_calc_forword\n");
     ret = test_2_calc_forword();
     if (ret != 0)
     {
         printf("error : test_2_calc_forword     \nerror id : %d\n", ret);
     }
+#endif // D_TEST_CALC_FORWARD
 
+#ifdef D_TEST_CAL_BACKWARD
     ret = test_2_calc_backword();
     if (ret != 0)
     {
         printf("error : test_2_calc_backword    \nerror id : %d\n", ret);
     }
+#endif // D_TEST_CAL_BACKWAR
     return 0;
 }
 
@@ -177,16 +205,20 @@ int test_2_delete_layer(void)
     for (int i = 0; test[i].type != -1; i++)
     {
         hLayer = NULL;
-        hLayer = create_layer(test[i].type, test[i].input_size, test[i].output_size);   
+        hLayer = create_layer(test[i].type, test[i].input_size, test[i].output_size);
         ret = delete_layer(hLayer);
-        if (test[i].exp_create==0) //hLayer not NULL --> ret should be E_OK(0)
+        if (test[i].exp_create == 0) // hLayer not NULL --> ret should be E_OK(0)
         {
-            if(ret != 0){
+            if (ret != 0)
+            {
                 test[i].result |= 0x2;
                 result = 1;
             }
-        }else{ //hLayer is NULL --> ret should NOT be E_OK(0)
-            if(ret ==0){
+        }
+        else
+        { // hLayer is NULL --> ret should NOT be E_OK(0)
+            if (ret == 0)
+            {
                 test[i].result |= 0x2;
                 result = 1;
             }
@@ -195,6 +227,7 @@ int test_2_delete_layer(void)
 
     return result;
 }
+
 int test_2_print_layer(void)
 {
     int result = 0;
@@ -230,10 +263,15 @@ int test_2_PointerLayerParameters(void)
 
     for (int i = 0; test[i].type != -1; i++)
     {
+        hLayer = NULL;
+        pParam = NULL;
+
         hLayer = create_layer(test[i].type, test[i].input_size, test[i].output_size);
         pParam = PointerLayerParameters(hLayer);
         if (test[i].exp_create == 0)
         {
+            // Layers with types where LayerParameter is defined should have valid LayerParameters.
+            // Layers with types where LayerParameter is NOT defined should not have valid LayerParameters.(NULL)
             switch (test[i].type)
             {
             case LT_Affine:
@@ -308,17 +346,24 @@ int test_2_PointerForwardOutput()
 
     int result = 0;
     int ret = 0;
-    void *pParam = NULL;
+    S_MATRIX *pMatrix = NULL;
     H_LAYER hLayer = NULL;
 
     for (int i = 0; test[i].type != -1; i++)
     {
-        pParam = NULL;
+        hLayer = NULL;
+        pMatrix = NULL;
         hLayer = create_layer(test[i].type, test[i].input_size, test[i].output_size);
-        pParam = PointerForwardOutput(hLayer);
+        pMatrix = (S_MATRIX *)PointerForwardOutput(hLayer);
         if (test[i].exp_create == 0)
         {
-            if (pParam == NULL)
+            if (pMatrix == NULL)
+            {
+                test[i].result |= 0x10;
+                result = 1;
+            }
+            // size check
+            if (pMatrix->column != 1 || pMatrix->row != test[i].output_size)
             {
                 test[i].result |= 0x10;
                 result = 1;
@@ -326,7 +371,7 @@ int test_2_PointerForwardOutput()
         }
         else
         {
-            if (pParam != NULL)
+            if (pMatrix != NULL)
             {
                 test[i].result |= 0x10;
                 result = 1;
@@ -339,17 +384,24 @@ int test_2_PointerBackwardOutput()
 {
     int result = 0;
     int ret = 0;
-    void *pParam = NULL;
+    S_MATRIX *pMatrix = NULL;
     H_LAYER hLayer = NULL;
 
     for (int i = 0; test[i].type != -1; i++)
     {
-        pParam = NULL;
+        pMatrix = NULL;
+        hLayer = NULL;
         hLayer = create_layer(test[i].type, test[i].input_size, test[i].output_size);
-        pParam = PointerBackwardOutput(hLayer);
+        pMatrix = (S_MATRIX *)PointerBackwardOutput(hLayer);
         if (test[i].exp_create == 0)
         {
-            if (pParam == NULL)
+            if (pMatrix == NULL)
+            {
+                test[i].result |= 0x20;
+                result = 1;
+            }
+            // size check
+            if (pMatrix->column != 1 || pMatrix->row != test[i].input_size)
             {
                 test[i].result |= 0x20;
                 result = 1;
@@ -357,7 +409,7 @@ int test_2_PointerBackwardOutput()
         }
         else
         {
-            if (pParam != NULL)
+            if (pMatrix != NULL)
             {
                 test[i].result |= 0x20;
                 result = 1;
