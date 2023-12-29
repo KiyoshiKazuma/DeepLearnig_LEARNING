@@ -125,7 +125,7 @@ H_LAYER create_layer(int type, unsigned int input_size, unsigned int output_size
         break;
     }
 
-    if (error != 0)
+    if (error == 0)
     {
         pLayer->hBackwardOutput = create_matrix(input_size, 1);
         pLayer->hForwardOutput = create_matrix(output_size, 1);
@@ -161,6 +161,8 @@ int print_layer(H_LAYER hLayer)
 
 int delete_layer(H_LAYER hLayer)
 {
+
+    int result=0;
     // NULL CEHCK
     if (hLayer == NULL)
     {
@@ -177,26 +179,26 @@ int delete_layer(H_LAYER hLayer)
         break;
     case LT_Affine:
         pParam = pLayer->pLayerParam;
-        delete_matrix((H_MATRIX)pParam[0]);
-        delete_matrix((H_MATRIX)pParam[1]);
+        result+= delete_matrix((H_MATRIX)pParam[0]);
+        result+= delete_matrix((H_MATRIX)pParam[1]);
         free(pParam);
 
         break;
     case LT_SoftmaxWithLoss:
         pParam = pLayer->pLayerParam;
-        delete_matrix((H_MATRIX)pParam[0]);
-        delete_matrix((H_MATRIX)pParam[1]);
+        result+= delete_matrix((H_MATRIX)pParam[0]);
+        result+= delete_matrix((H_MATRIX)pParam[1]);
         free(pParam);
         break;
     default:
         break;
     }
 
-    delete_matrix(pLayer->hBackwardOutput);
-    delete_matrix(pLayer->hForwardOutput);
+    result+= delete_matrix(pLayer->hBackwardOutput);
+    result+=  delete_matrix(pLayer->hForwardOutput);
     free(pLayer);
 
-    return 0;
+    return result;
 }
 
 void *PointerLayerParameters(H_LAYER hLayer)

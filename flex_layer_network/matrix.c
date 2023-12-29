@@ -41,6 +41,9 @@ H_MATRIX create_matrix(unsigned int row_size, unsigned int column_size)
 */
 int delete_matrix(H_MATRIX hMatrix)
 {
+    if(hMatrix==NULL){
+        return 1;
+    }
     S_MATRIX *pMatrix = (S_MATRIX *)hMatrix;
     free(pMatrix->pElem);
     free(pMatrix);

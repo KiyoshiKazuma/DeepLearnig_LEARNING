@@ -48,7 +48,7 @@ int main(void)
 {
     int ret = 0;
 
-    printf("RUNNING : test_2_create_layer\n");
+   printf("RUNNING : test_2_create_layer\n");
     ret = test_2_create_layer();
     if (ret != 0)
     {
@@ -90,7 +90,6 @@ int main(void)
         }
     }
 
-    
     printf("RUNNING : test_2_PointerLayerParameters\n");
     ret = test_2_PointerLayerParameters();
     if (ret != 0)
@@ -118,7 +117,6 @@ int main(void)
             }
         }
     }
-
 
     printf("RUNNING : test_2_PointerBackwardOutput\n");
     ret = test_2_PointerBackwardOutput();
@@ -165,9 +163,8 @@ int test_2_create_layer(void)
                 test[i].result |= 0x1;
                 result = 1;
             }
-            ret = delete_layer(hLayer);
         }
-        hLayer = NULL;
+        ret = delete_layer(hLayer);
     }
 
     return result;
@@ -180,12 +177,19 @@ int test_2_delete_layer(void)
     for (int i = 0; test[i].type != -1; i++)
     {
         hLayer = NULL;
-        hLayer = create_layer(test[i].type, test[i].input_size, test[i].output_size);
+        hLayer = create_layer(test[i].type, test[i].input_size, test[i].output_size);   
         ret = delete_layer(hLayer);
-        if (ret != test[i].exp_create)
+        if (test[i].exp_create==0) //hLayer not NULL --> ret should be E_OK(0)
         {
-            test[i].result |= 0x2;
-            result = 1;
+            if(ret != 0){
+                test[i].result |= 0x2;
+                result = 1;
+            }
+        }else{ //hLayer is NULL --> ret should NOT be E_OK(0)
+            if(ret ==0){
+                test[i].result |= 0x2;
+                result = 1;
+            }
         }
     }
 
@@ -377,7 +381,7 @@ int test_2_calc_forword(void)
     S_MATRIX *pOutput = NULL;
     S_MATRIX *pW = NULL;
     S_MATRIX *pB = NULL;
-    H_MATRIX * vLayerParams = NULL;
+    H_MATRIX *vLayerParams = NULL;
 
     //(1) ReLu collect
     double input_1[3] = {-1.0, 0.0, 1.0};
@@ -385,7 +389,7 @@ int test_2_calc_forword(void)
     hLayer = create_layer(LT_ReLU, 3, 3);
     hOutput = PointerForwardOutput(hLayer);
     hInput = create_matrix(3, 1);
-    pLayer = (S_MATRIX *)hLayer;
+    pLayer = (S_LAYER *)hLayer;
     pOutput = (S_MATRIX *)hOutput;
     pInput = (S_MATRIX *)hInput;
     for (int i = 0; i < 3; i++)
@@ -412,9 +416,11 @@ int test_2_calc_forword(void)
     }
     printf("test_2_calc_forword : (1) result\n");
     printf("\texp \t: ");
-    for(int i =0;i<3;i++)printf("  %f  ",exp_1[i]);
+    for (int i = 0; i < 3; i++)
+        printf("  %f  ", exp_1[i]);
     printf("\n\toutput \t");
-    for(int i =0;i<3;i++)printf("  %f  ",pOutput->pElem[i]);
+    for (int i = 0; i < 3; i++)
+        printf("  %f  ", pOutput->pElem[i]);
     printf("\n");
 
     delete_layer(hLayer);
@@ -464,12 +470,12 @@ int test_2_calc_forword(void)
     delete_matrix(hInput);
 
     //(3)Affine Collect
-    
+
     double input_3[3] = {-1.0, 0.0, 1.0};
-    double exp_3[2] = {9.0,10.0};
-    double W_3[6] ={1,2,3,4,5,6};
-    double B_3[2] ={7,8};
-    
+    double exp_3[2] = {9.0, 10.0};
+    double W_3[6] = {1, 2, 3, 4, 5, 6};
+    double B_3[2] = {7, 8};
+
     hLayer = NULL;
     hInput = NULL;
     hOutput = NULL;
@@ -480,24 +486,25 @@ int test_2_calc_forword(void)
     pOutput = NULL;
     pW = NULL;
     pB = NULL;
-    
-    
+
     hLayer = create_layer(LT_Affine, 3, 2);
     hInput = create_matrix(3, 1);
     hOutput = PointerForwardOutput(hLayer);
     pLayer = (S_LAYER *)hLayer;
     pInput = (S_MATRIX *)hInput;
     pOutput = (S_MATRIX *)hOutput;
-    vLayerParams=(H_MATRIX *)PointerLayerParameters(hLayer);
-    hW=vLayerParams[0];
-    hB=vLayerParams[1];
-    pW=(S_MATRIX*)hW;
-    pB=(S_MATRIX*)hB;
-    for(int i=0;i<6;i++){
-        pW->pElem[i]=W_3[i];
+    vLayerParams = (H_MATRIX *)PointerLayerParameters(hLayer);
+    hW = vLayerParams[0];
+    hB = vLayerParams[1];
+    pW = (S_MATRIX *)hW;
+    pB = (S_MATRIX *)hB;
+    for (int i = 0; i < 6; i++)
+    {
+        pW->pElem[i] = W_3[i];
     }
-    for(int i=0;i<2;i++){
-        pB->pElem[i]=B_3[i];
+    for (int i = 0; i < 2; i++)
+    {
+        pB->pElem[i] = B_3[i];
     }
 
     for (int i = 0; i < 3; i++)
