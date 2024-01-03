@@ -6,7 +6,7 @@
 double calc_sigmoid(double x)
 {
     double y = 0;
-    y = 1.0 / (1.0 + exp(x));
+    y = 1.0 / (1.0 + exp(-x));
     return y;
 }
 

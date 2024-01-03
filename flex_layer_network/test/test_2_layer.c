@@ -9,7 +9,7 @@
 #define D_TEST_P2_LAYER_PARAMS
 #define D_TEST_P2_FORWARD_OUTPUT
 #define D_TEST_P2_BACKWARD_OUTPUT
-// #define D_TEST_CALC_FORWARD
+#define D_TEST_CALC_FORWARD
 // #define D_TEST_CAL_BACKWARD
 
 typedef struct
@@ -433,6 +433,9 @@ int test_2_calc_forword(void)
     S_MATRIX *pOutput = NULL;
     S_MATRIX *pW = NULL;
     S_MATRIX *pB = NULL;
+    S_MATRIX *pY = NULL;
+    S_MATRIX *pT = NULL;
+
     H_MATRIX *vLayerParams = NULL;
 
     //(1) ReLu collect
@@ -444,6 +447,7 @@ int test_2_calc_forword(void)
     pLayer = (S_LAYER *)hLayer;
     pOutput = (S_MATRIX *)hOutput;
     pInput = (S_MATRIX *)hInput;
+    ret = 0;
     for (int i = 0; i < 3; i++)
     {
         pInput->pElem[i] = input_1[i];
@@ -466,15 +470,7 @@ int test_2_calc_forword(void)
     {
         result += 0x1;
     }
-    printf("test_2_calc_forword : (1) result\n");
-    printf("\texp \t: ");
-    for (int i = 0; i < 3; i++)
-        printf("  %f  ", exp_1[i]);
-    printf("\n\toutput \t");
-    for (int i = 0; i < 3; i++)
-        printf("  %f  ", pOutput->pElem[i]);
-    printf("\n");
-
+    
     delete_layer(hLayer);
     delete_matrix(hInput);
 
@@ -487,6 +483,7 @@ int test_2_calc_forword(void)
     pLayer = NULL;
     pInput = NULL;
     pOutput = NULL;
+    ret = 0;
 
     hLayer = create_layer(LT_Sigmoid, 3, 3);
     hInput = create_matrix(3, 1);
@@ -581,6 +578,65 @@ int test_2_calc_forword(void)
     if (ret != 0)
     {
         result += 0x4;
+    }
+    delete_layer(hLayer);
+    delete_matrix(hInput);
+
+    //(4)SofmaxWithLoss collect
+    double exp_4 = 0.6076;
+    double Y_exp_4[3] = {0.09, 0.24, 0.67};
+    double input_4[3] = {1.0, 2.0, 3.0};
+    double T_4[3] = {0.0, 0.2, 0.8};
+
+    hLayer = NULL;
+    pLayer = NULL;
+    pInput = NULL;
+    pOutput = NULL;
+    pY = NULL;
+    pT = NULL;
+    ret = 0;
+
+    hLayer = create_layer(LT_SoftmaxWithLoss, 3, 1);
+    pLayer = (S_LAYER *)hLayer;
+    vLayerParams = (H_MATRIX *)PointerLayerParameters(hLayer);
+    pY = (S_MATRIX *)vLayerParams[0];
+    pT = (S_MATRIX *)vLayerParams[1];
+    pOutput = PointerForwardOutput(hLayer);
+    hInput = create_matrix(3, 1);
+    pInput = (S_MATRIX *)hInput;
+
+    for (int i = 0; i < 3; i++)
+    {
+        pInput->pElem[i] = input_4[i];
+    }
+    for (int i = 0; i < pT->size; i++)
+    {
+        pT->pElem[i] = T_4[i];
+    }
+    ret += calc_forword(hLayer, hInput);
+
+    // check output
+    if (ret == 0)
+    {
+        double diff = 0.0;
+        diff = pOutput->pElem[0] - exp_4;
+        if (diff  < -0.01 || diff  > 0.01)
+        {
+            ret += 1;
+        }
+
+        for (int i = 0; i < 3; i++)
+        {
+            diff = pY->pElem [i] - Y_exp_4[i];
+            if (diff  < -0.01 || diff  > 0.01)
+            {
+                ret += 0x1 << (i + 1);
+            }
+        }
+    }
+    if (ret != 0)
+    {
+        result += 0x8;
     }
     delete_layer(hLayer);
     delete_matrix(hInput);
