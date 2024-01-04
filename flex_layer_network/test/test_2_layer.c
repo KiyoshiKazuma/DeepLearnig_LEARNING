@@ -10,7 +10,7 @@
 #define D_TEST_P2_FORWARD_OUTPUT
 #define D_TEST_P2_BACKWARD_OUTPUT
 #define D_TEST_CALC_FORWARD
-// #define D_TEST_CAL_BACKWARD
+#define D_TEST_CAL_BACKWARD
 
 typedef struct
 {
@@ -159,6 +159,7 @@ int main(void)
 #endif // D_TEST_CALC_FORWARD
 
 #ifdef D_TEST_CAL_BACKWARD
+    printf("RUNNING : test_2_calc_backward\n");
     ret = test_2_calc_backword();
     if (ret != 0)
     {
@@ -645,5 +646,9 @@ int test_2_calc_forword(void)
 }
 int test_2_calc_backword(void)
 {
+    //(1)LeRU collect
+    double input_1[]={-1.0,0.0,1.0};
+    double exp_1[]={0.0,0.0,1.0};
+    
     return 0;
 }

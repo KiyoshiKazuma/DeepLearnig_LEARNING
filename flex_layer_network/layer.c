@@ -162,7 +162,7 @@ int print_layer(H_LAYER hLayer)
 int delete_layer(H_LAYER hLayer)
 {
 
-    int result=0;
+    int result = 0;
     // NULL CEHCK
     if (hLayer == NULL)
     {
@@ -179,23 +179,23 @@ int delete_layer(H_LAYER hLayer)
         break;
     case LT_Affine:
         pParam = pLayer->pLayerParam;
-        result+= delete_matrix((H_MATRIX)pParam[0]);
-        result+= delete_matrix((H_MATRIX)pParam[1]);
+        result += delete_matrix((H_MATRIX)pParam[0]);
+        result += delete_matrix((H_MATRIX)pParam[1]);
         free(pParam);
 
         break;
     case LT_SoftmaxWithLoss:
         pParam = pLayer->pLayerParam;
-        result+= delete_matrix((H_MATRIX)pParam[0]);
-        result+= delete_matrix((H_MATRIX)pParam[1]);
+        result += delete_matrix((H_MATRIX)pParam[0]);
+        result += delete_matrix((H_MATRIX)pParam[1]);
         free(pParam);
         break;
     default:
         break;
     }
 
-    result+= delete_matrix(pLayer->hBackwardOutput);
-    result+=  delete_matrix(pLayer->hForwardOutput);
+    result += delete_matrix(pLayer->hBackwardOutput);
+    result += delete_matrix(pLayer->hForwardOutput);
     free(pLayer);
 
     return result;
@@ -331,5 +331,47 @@ int calc_forword(H_LAYER hLayer, H_MATRIX hMatrix)
 }
 int calc_backword(H_LAYER hLayer, H_MATRIX hMatrix)
 {
+    // NULL CHECK
+    if (hLayer == NULL || hMatrix == NULL)
+    {
+        return 1;
+    }
+    S_LAYER *pLayer = (S_LAYER *)hLayer;
+    S_MATRIX *pMatrix = (S_MATRIX *)hMatrix;
+    S_MATRIX *pOutput = (S_MATRIX *)PointerBackwardOutput(hLayer);
+
+    // size check
+    // Input Matrix Size should be (OUTPUT_SIZE,1)
+    if (pMatrix->row != pLayer->output_size || pMatrix->column != 1)
+    {
+        return 1;
+    }
+
+    // execute calclation
+    switch(pLayer->type)
+    {
+    case LT_ReLU:
+        for (unsigned int i = 0; i < pLayer->output_size; i++)
+        {
+            if (pMatrix->pElem[i] > 0)
+            {
+                pOutput->pElem[i] = pMatrix->pElem[i];
+            }
+            else
+            {
+                pOutput->pElem[i] = 0;
+            }
+        }
+        break;
+    case LT_Sigmoid:
+        break;
+    case LT_Affine:
+        break;
+    case LT_SoftmaxWithLoss:
+        break;
+    default:
+        break;
+    }
+
     return 0;
 }
