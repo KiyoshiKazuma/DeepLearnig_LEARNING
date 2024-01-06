@@ -4,7 +4,7 @@
 		{
 			"type": "cppbuild",
 			"label": "C/C++: gcc.exe アクティブなファイルのビルド",
-			"command": "C:/MinGW/bin/gcc.exe",
+			"command": "C:/MinGW/mingw64/bin/gcc.exe",
 			"args": [
 				"-fdiagnostics-color=always",
 				"-g",
@@ -13,7 +13,7 @@
 				"${fileDirname}\\${fileBasenameNoExtension}.exe"
 			],
 			"options": {
-				"cwd": "C:/MinGW/bin"
+				"cwd": "C:/MinGW/mingw64/bin"
 			},
 			"problemMatcher": [
 				"$gcc"
@@ -22,7 +22,7 @@
 				"kind": "build",
 				"isDefault": true
 			},
-			"detail": "コンパイラ: C:/MinGW/bin/gcc.exe"
+			"detail": "コンパイラ: C:/MinGW/mingw64/bin/gcc.exe"
 		}
 	]
 }

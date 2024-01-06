@@ -14,6 +14,11 @@ H_MATRIX create_matrix(unsigned int row_size, unsigned int column_size);
 int delete_matrix(H_MATRIX hMatrix);
 int add_matrix(H_MATRIX hMatix_IN1, H_MATRIX hMatix_IN2, H_MATRIX hMatix_OUT);
 int product_matrix(H_MATRIX hMatix_IN1, H_MATRIX hMatix_IN2, H_MATRIX hMatix_OUT);
+H_MATRIX transpose_matrix(H_MATRIX hMatrix_IN);
 int print_matrix(H_MATRIX hMatrix);
 int copy_matrix(H_MATRIX hMatix_IN,H_MATRIX hMatix_OUT);
+
+unsigned int element_value_matrix(H_MATRIX hMatrix,unsigned int i,unsigned int j);
+unsigned int element_num_matrix(H_MATRIX hMatrix,unsigned int i,unsigned int j);
+
 #endif //D_MATRIX

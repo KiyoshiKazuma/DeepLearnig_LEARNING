@@ -2,6 +2,7 @@
 #define D_LAYER
 
 #include "matrix.h"
+#define D_LEARNING_RATE (0.1)
 
 enum LayerType{
 	LT_ReLU =1,	

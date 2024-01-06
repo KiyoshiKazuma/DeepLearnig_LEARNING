@@ -166,6 +166,7 @@ int main(void)
         printf("error : test_2_calc_backword    \nerror id : %d\n", ret);
     }
 #endif // D_TEST_CAL_BACKWAR
+    printf("FINISH TEST \n");
     return 0;
 }
 
@@ -228,7 +229,6 @@ int test_2_delete_layer(void)
 
     return result;
 }
-
 int test_2_print_layer(void)
 {
     int result = 0;
@@ -247,7 +247,6 @@ int test_2_print_layer(void)
     }
     return result;
 }
-
 int test_2_PointerLayerParameters(void)
 {
 
@@ -419,7 +418,6 @@ int test_2_PointerBackwardOutput()
     }
     return result;
 }
-
 int test_2_calc_forword(void)
 {
     int result = 0;
@@ -471,7 +469,7 @@ int test_2_calc_forword(void)
     {
         result += 0x1;
     }
-    
+
     delete_layer(hLayer);
     delete_matrix(hInput);
 
@@ -621,15 +619,15 @@ int test_2_calc_forword(void)
     {
         double diff = 0.0;
         diff = pOutput->pElem[0] - exp_4;
-        if (diff  < -0.01 || diff  > 0.01)
+        if (diff < -0.01 || diff > 0.01)
         {
             ret += 1;
         }
 
         for (int i = 0; i < 3; i++)
         {
-            diff = pY->pElem [i] - Y_exp_4[i];
-            if (diff  < -0.01 || diff  > 0.01)
+            diff = pY->pElem[i] - Y_exp_4[i];
+            if (diff < -0.01 || diff > 0.01)
             {
                 ret += 0x1 << (i + 1);
             }
@@ -646,9 +644,241 @@ int test_2_calc_forword(void)
 }
 int test_2_calc_backword(void)
 {
+    H_MATRIX hInput = NULL;
+    H_MATRIX hOutput = NULL;
+    H_LAYER hLayer = NULL;
+    S_MATRIX *pInput = NULL;
+    S_MATRIX *pOutput = NULL;
+    S_LAYER *pLayer = NULL;
+    H_MATRIX *vParam = NULL;
+    int ret = 0;
+    int result = 0;
+
     //(1)LeRU collect
-    double input_1[]={-1.0,0.0,1.0};
-    double exp_1[]={0.0,0.0,1.0};
+    double input_1[] = {-1.0, 0.0, 1.0};
+    double exp_1[] = {0.0, 0.0, 1.0};
+
+    hLayer = NULL;
+    hInput = NULL;
+    ret = 0;
+
+    hLayer = create_layer(LT_ReLU, 3, 3);
+    pLayer = (S_LAYER *)hLayer;
+
+    // set input data
+    hInput = create_matrix(3, 1);
+    pInput = (S_MATRIX *)hInput;
+
+    for (int i = 0; i < 3; i++)
+    {
+        pInput->pElem[i] = input_1[i];
+    }
+
+    // execute calcuration
+    ret = calc_backword(hLayer, hInput);
+
+    // check output
+    hOutput = PointerBackwardOutput(hLayer);
+    pOutput = (S_MATRIX *)hOutput;
+    for (int i = 0; i < 3; i++)
+    {
+        if (pOutput->pElem[i] != exp_1[i])
+        {
+            ret += 1;
+        }
+    }
+    if (ret != 0)
+    {
+        result += (0x1 << 0);
+    }
+
+    // free alocated memmory
+    delete_layer(hLayer);
+    delete_matrix(hInput);
+
+    //(2)Sigmoid collect
+    double input_2[] = {0.0, 0.5, 1.0};
+    double exp_2[] = {0.0, 0.25, 0.0};
+    hLayer = NULL;
+    hInput = NULL;
+    ret = 0;
+
+    hLayer = create_layer(LT_Sigmoid, 3, 3);
+    pLayer = (S_LAYER *)hLayer;
+
+    // set input data
+    hInput = create_matrix(3, 1);
+    pInput = (S_MATRIX *)hInput;
+
+    for (int i = 0; i < 3; i++)
+    {
+        pInput->pElem[i] = input_2[i];
+    }
+
+    // execute calcuration
+    ret = calc_backword(hLayer, hInput);
+
+    // check output
+    hOutput = PointerBackwardOutput(hLayer);
+    pOutput = (S_MATRIX *)hOutput;
+    for (int i = 0; i < 3; i++)
+    {
+        double diff = pOutput->pElem[i] - exp_2[i];
+        if (diff < -0.01 || diff > 0.01)
+        {
+            ret += 1;
+        }
+    }
+    if (ret != 0)
+    {
+        result += (0x1 << 1);
+    }
+
+    // free alocated memmory
+    delete_layer(hLayer);
+    delete_matrix(hInput);
+
+    //(3)Affine collect
+    double input_3[] = {0.0, 0.5, 1.0};
+    double W_3[3][2] = {
+        {1, 2},
+        {3, 4},
+        {5, 6}};
+    double B_3[3] = {7, 8, 9};
+    double X_3[2] = {1, 2};
+    double exp_3[2] = {6.5, 8.0};
+    double exp_dW_3[3][2] = {
+        {0, 0},
+        {0.5, 1},
+        {1, 2}};
+    double exp_dB_3[3] = {0, 0.5, 1};
+    hLayer = NULL;
+    hInput = NULL;
+    vParam = NULL;
+    ret = 0;
+
+    // set layer
+    hLayer = create_layer(LT_Affine, 2, 3);
+    pLayer = (S_LAYER *)hLayer;
+    vParam = PointerLayerParameters(hLayer);
+    S_MATRIX *pW = (S_MATRIX *)vParam[0];
+    S_MATRIX *pB = (S_MATRIX *)vParam[1];
+    S_MATRIX *pX = (S_MATRIX *)vParam[2];
+    for (unsigned int i = 0; i < pW->row; i++)
+    {
+        for (unsigned int j = 0; j < pW->column; j++)
+        {
+            pW->pElem[element_num_matrix(pW, i, j)] = W_3[i][j];
+        }
+    }
+    for (unsigned int i = 0; i < pB->row; i++)
+    {
+        pB->pElem[element_num_matrix(pB, i, 0)] = B_3[i];
+    }
+    for (unsigned int i = 0; i < pX->row; i++)
+    {
+        pX->pElem[element_num_matrix(pX, i, 0)] = X_3[i];
+    }
+
+    // set input data
+    hInput = create_matrix(3, 1);
+    pInput = (S_MATRIX *)hInput;
+
+    for (int i = 0; i < 3; i++)
+    {
+        pInput->pElem[i] = input_3[i];
+    }
+
+    // execute calcuration
+    ret = calc_backword(hLayer, hInput);
+
+    // check output
+    hOutput = PointerBackwardOutput(hLayer);
+    pOutput = (S_MATRIX *)hOutput;
+    for (int i = 0; i < 2; i++)
+    {
+        double diff = pOutput->pElem[i] - exp_3[i];
+        if (diff < -0.01 || diff > 0.01)
+        {
+            ret += 1;
+        }
+    }
+
+    for (unsigned int i = 0; i < pW->row; i++)
+    {
+        for (unsigned int j = 0; j < pW->column; j++)
+        {
+            double diff = W_3[i][j] - exp_dW_3[i][j] * D_LEARNING_RATE - pW->pElem[element_num_matrix(pW, i, j)];
+            if (diff < -0.01 || diff > 0.01)
+            {
+                ret += 1;
+            }
+        }
+    }
+
+    for (unsigned int i = 0; i < pB->row; i++)
+    {
+        double diff = B_3[i] - exp_dB_3[i] * D_LEARNING_RATE - pB->pElem[element_num_matrix(pB, i, 0)];
+        if (diff < -0.01 || diff > 0.01)
+        {
+            ret += 1;
+        }
+    }
+
+    if (ret != 0)
+    {
+        result += (0x1 << 2);
+    }
+
+    // free alocated memmory
+    delete_matrix(hInput);
+    delete_layer(hLayer);
+
+
+   //(4)Sigmoid collect
+    double Y_4[] = {0.0, 0.3, 0.7};
+    double T_4[] = {0.7, 0.3, 0.0};
+    double exp_4[] = {-0.7,0.0,0.7};
+    hLayer = NULL;
+    hInput = NULL;
+    ret = 0;
+    S_MATRIX * pY=NULL;
+    S_MATRIX *pT =NULL;
+
+    hLayer = create_layer(LT_SoftmaxWithLoss, 3, 1);
+    pLayer = (S_LAYER *)hLayer;
+
+    // set input data
+    vParam=PointerLayerParameters(hLayer);
+    pY=(S_MATRIX *)vParam[0];
+    pT=(S_MATRIX *)vParam[1];
+    for (int i = 0; i < pLayer->input_size; i++)
+    {
+        pY->pElem[i]=Y_4[i];
+        pT->pElem[i]=T_4[i];
+    }
+
+    // execute calcuration
+    ret = calc_backword(hLayer, NULL);
+
+    // check output
+    hOutput = PointerBackwardOutput(hLayer);
+    pOutput = (S_MATRIX *)hOutput;
+    for (int i = 0; i < 3; i++)
+    {
+        double diff = pOutput->pElem[i] - exp_4[i];
+        if (diff < -0.01 || diff > 0.01)
+        {
+            ret += 1;
+        }
+    }
+    if (ret != 0)
+    {
+        result += (0x1 << 3);
+    }
+
+    // free alocated memmory
+    delete_layer(hLayer);
     
-    return 0;
+    return result;
 }

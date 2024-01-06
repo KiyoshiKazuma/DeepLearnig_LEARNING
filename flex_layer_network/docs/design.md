@@ -41,7 +41,7 @@
 |:-|:-|
 |LT_ReLU|NULL|
 |LT_Sigmoid|NULL|
-|LT_Affine|void *pAffineParams[2]={hW,hB}(ポインタ配列)|
+|LT_Affine|void *pAffineParams[3]={hW,hB,hX}(ポインタ配列)|
 |LT_Softmax|NULL|
 |LT_SoftmaxWithLoss|void * pSWLParams[2]={hY,hT}(ポインタ配列)|
   
@@ -106,8 +106,8 @@ $$また$$
 \end{cases}
 $$
 もしくは
-$$\frac{\partial L}{\partial X}=\frac{\partial L}{\partial Y}\cdot W^T$$
-$$\frac{\partial L}{\partial W}=X^T\cdot\frac{\partial L}{\partial Y}$$
+$$\frac{\partial L}{\partial X}=W^T \cdot\frac{\partial L}{\partial Y}$$
+$$\frac{\partial L}{\partial W}=\frac{\partial L}{\partial Y}\cdot X^T$$
 $$\frac{\partial L}{\partial B}=\frac{\partial L}{\partial Y}$$
 
 ######Softmax
@@ -326,7 +326,7 @@ matrixハンドラーを削除する。
   
 ・戻り値 int
 正常：0
-異常：-1
+異常：1
   
   
 ######int add_matrix
@@ -342,7 +342,7 @@ matrixハンドラーを削除する。
   
 ・戻り値 int
 正常：0
-異常：-1
+異常：1
   
 ######int product_matrix
 ・概要
@@ -357,7 +357,19 @@ matrixハンドラーを削除する。
   
 ・戻り値 int
 正常：0
-異常：-1
+異常：1
+
+######H_MATRIX transpose_matrix
+・概要
+matrixの転置行列を生成する
+・引数
+|型|引数名|概要|
+|-:|:-|:-|
+|H_MATRIX|hMatrix|転置元の行列|
+  
+・戻り値 int
+正常：0
+異常：1
   
 ######int print_matrix
 ・概要
@@ -368,9 +380,28 @@ matrixの要素を表示する。
 |H_MATRIX|hMatrix_IN1|入力の行列ハンドラー|
   
 ・戻り値 int
-正常：0
-異常：-1
+正常：ポインタ
+異常：NULL
+
+・エラー判定
+引数がNULL  
+
+######int copy_matrix
+・概要
+行列の要素の値をコピーする
+・引数
+|型|引数名|概要|
+|-:|:-|:-|
+|H_MATRIX|hMatrix_IN|コピー元の行列ハンドラー|
+|H_MATRIX|hMatrix_OUT|コピー先の行列ハンドラー|
   
+・戻り値 int
+正常：0
+異常：1
+
+・エラー判定
+引数が一つ以上NULL
+コピー先とコピー元の行列のサイズが異なる
   
   
 ###固定値

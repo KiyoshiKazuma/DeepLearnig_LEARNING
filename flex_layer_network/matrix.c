@@ -22,13 +22,15 @@ H_MATRIX create_matrix(unsigned int row_size, unsigned int column_size)
     hMatrix->row = row_size;
     hMatrix->size = row_size * column_size;
     double *vec = (double *)malloc(sizeof(double) * hMatrix->size);
-    if(vec==NULL){
+    if (vec == NULL)
+    {
         free(hMatrix);
         return NULL;
     }
     hMatrix->pElem = vec;
-    for(int i=0;i<hMatrix->size;i++){
-        vec[i]=0.0;
+    for (int i = 0; i < hMatrix->size; i++)
+    {
+        vec[i] = 0.0;
     }
     return hMatrix;
 }
@@ -41,7 +43,8 @@ H_MATRIX create_matrix(unsigned int row_size, unsigned int column_size)
 */
 int delete_matrix(H_MATRIX hMatrix)
 {
-    if(hMatrix==NULL){
+    if (hMatrix == NULL)
+    {
         return 1;
     }
     S_MATRIX *pMatrix = (S_MATRIX *)hMatrix;
@@ -58,7 +61,7 @@ int delete_matrix(H_MATRIX hMatrix)
 戻り値 非負値　配列の番号
         -1    エラー
 */
-int element_num_matrix(H_MATRIX hMatrix, int i, int j)
+unsigned int element_num_matrix(H_MATRIX hMatrix,unsigned int i,unsigned int j)
 {
     S_MATRIX *pMatrix = (S_MATRIX *)hMatrix;
     if (i >= pMatrix->row || j >= pMatrix->column)
@@ -66,8 +69,26 @@ int element_num_matrix(H_MATRIX hMatrix, int i, int j)
         printf("ERROR:###element_num_matrix###\nmatrix element num out of range\n");
         return -2;
     }
-    int n = pMatrix->column * i + j;
+    unsigned int n = pMatrix->column * i + j;
     return n;
+}
+
+/*関数　element_value_matrix
+概要　行列の行・列番号から配列の値を返す。
+引数    H_MATRIX * hMatrix 行列のハンドラ
+        int i   行番号
+        int j   列番号
+戻り値 配列の値
+*/
+unsigned int element_value_matrix(H_MATRIX hMatrix,unsigned int i,unsigned int j)
+{
+    S_MATRIX *pMatrix = (S_MATRIX *)hMatrix;
+    if (i >= pMatrix->row || j >= pMatrix->column)
+    {
+        printf("ERROR:###element_num_matrix###\nmatrix element num out of range\n");
+        return -2;
+    }
+    return pMatrix->pElem[element_num_matrix(hMatrix,i,j)];
 }
 
 /*  関数　add_matrix
@@ -163,31 +184,65 @@ int print_matrix(H_MATRIX hMatrix)
     {
         for (int j = 0; j < pMatrix->column; j++)
         {
-            printf("%4.4f  ", pMatrix->pElem[element_num_matrix(hMatrix,i,j)]);
+            printf("%4.4f  ", pMatrix->pElem[element_num_matrix(hMatrix, i, j)]);
         }
         printf("\n");
     }
 }
 
+/*  関数　transpose_matrix
+概要　転置行列を生成する
+引数    H_MATRIX hMatrix_IN 転置する元の行列
+戻り値  転置した行列のポインタ
+        NULL:異常
+*/
+H_MATRIX transpose_matrix(H_MATRIX hMatrix_IN)
+{
+    // NULL check
+    if (hMatrix_IN == NULL)
+    {
+        return NULL;
+    }
+    S_MATRIX *pMatrix_IN = (S_MATRIX *)hMatrix_IN;
+    H_MATRIX hMatrix_OUT = create_matrix(pMatrix_IN->column, pMatrix_IN->row);
+    if (hMatrix_OUT == NULL)
+    {
+        return NULL;
+    }
+    S_MATRIX *pMatrix_OUT = (S_MATRIX *)hMatrix_OUT;
 
-int copy_matrix(H_MATRIX hMatix_IN,H_MATRIX hMatix_OUT){
-    //NULL CHECK
-    if(hMatix_IN==NULL || hMatix_OUT==NULL){
+    for (unsigned int i = 0; i < pMatrix_IN->row; i++)
+    {
+        for (unsigned int j = 0; j < pMatrix_IN->column; j++)
+        {
+            pMatrix_OUT->pElem[element_num_matrix(hMatrix_OUT,j,i)]=element_value_matrix(hMatrix_IN,i,j);
+        }
+    }
+    return hMatrix_OUT;
+}
+
+int copy_matrix(H_MATRIX hMatix_IN, H_MATRIX hMatix_OUT)
+{
+    // NULL CHECK
+    if (hMatix_IN == NULL || hMatix_OUT == NULL)
+    {
         return 1;
     }
-    S_MATRIX * pMatrix_IN = NULL;
-    S_MATRIX * pMatrix_OUT = NULL;
-    pMatrix_IN=(S_MATRIX *)hMatix_IN;
-    pMatrix_OUT=(S_MATRIX *)hMatix_OUT;
+    S_MATRIX *pMatrix_IN = NULL;
+    S_MATRIX *pMatrix_OUT = NULL;
+    pMatrix_IN = (S_MATRIX *)hMatix_IN;
+    pMatrix_OUT = (S_MATRIX *)hMatix_OUT;
 
-    //SIZE CHECK
-    if(pMatrix_IN->row!=pMatrix_OUT->row || pMatrix_IN->column!=pMatrix_OUT->column){
+    // SIZE CHECK
+    if (pMatrix_IN->row != pMatrix_OUT->row || pMatrix_IN->column != pMatrix_OUT->column)
+    {
         return 1;
     }
 
-    //copy elements
-    for(int i=0;i<pMatrix_IN->size;i++){
-        pMatrix_OUT->pElem[i]=pMatrix_IN->pElem[i];
+    // copy elements
+    for (int i = 0; i < pMatrix_IN->size; i++)
+    {
+        pMatrix_OUT->pElem[i] = pMatrix_IN->pElem[i];
     }
     return 0;
 }
