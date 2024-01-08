@@ -20,6 +20,112 @@
 |5|load neural network|ニューラルネットワーク(構成・パラメータ)のファイルを読み込み、再構成する。|
   
 ###インターフェイスデザイン
+####networkハンドラー
+#####H_NETWORK
+#####概要
+ニューラルネットワークを構成する複数のレイヤーの構造を保持する。
+ネットワーク全体でのフォワード計算と、誤差逆伝播法による学習を実行する。
+#####変数　S_NETWORK
+|型|変数名|概要|
+|-:|:-|:-|
+|unsigned int|size|NETWORKのサイズ。含まれるLAYERの数。|
+|H_LAYER *|vLayer|NETWORKに含まれているLAYERハンドラへのポインター列|
+|unsigned int|input_size|ネットワークの入力要素数|
+|unsigned int|output_size|ネットワークの出力要素数|
+
+#####機能
+
+######H_NETWORK create_network
+・概要
+ネットワークハンドラを生成する。
+・引数
+|型|引数名|概要|
+|-:|:-|:-|
+|unsigned int|input_size|ネットワークの入力要素数|
+|unsigned int|output_size|ネットワークの出力要素数|
+  
+・戻り値 
+正常：ネットワークハンドラのポインタ
+異常：NULL
+
+・エラー判定
+input_size=0
+output_size=0
+
+######int add_network
+・概要
+ネットワークにLAYERを追加する。
+・引数
+|型|引数名|概要|
+|-:|:-|:-|
+|H_NETWORK|hNetwork|対象のネットワークハンドラー|
+|LayerType|LayerType|追加するLAYERの種類|
+|unsigned int|IF_size|追加するLAYERの出力要素数|
+
+※IF_sizeはAffineレイヤーのみ必要
+※SoftmaxWithLossレイヤーの出力要素数は自動的にネットワークの出力要素数を割り当てる。
+  
+・戻り値 
+正常：0
+異常：1
+
+・エラー判定
+LayerTypeが未定義値
+AffineレイヤーでIF_sizeが0
+LT_SoftmaxWithLossの後にレイヤーを追加するとき
+
+######int print_network
+・概要
+ネットワークの構成情報を出力する
+>出力例
+>input : 3
+>AffineLayer 3:4
+>SigmoidLayer 4:4
+>AffineLayer 4:4
+>SoftmaxWithLossLayer 4:1
+>output : 3
+
+・引数
+|型|引数名|概要|
+|-:|:-|:-|
+|H_NETWORK|hNetwork|対象のネットワークハンドラー|
+
+・戻り値 
+正常：0
+異常：1
+
+・エラー判定
+引数がNULL
+
+######int calc_forword
+・概要
+ネットワーク順計算を実行し、結果を返す。
+
+・引数
+|型|引数名|概要|
+|-:|:-|:-|
+|H_NETWORK|hNetwork|対象のネットワークハンドラー|
+|H_MATRIX|hInput|入力変数の行列|
+|H_MATRIX|hOutput|出力変数の行列|
+
+・戻り値 
+正常：0
+異常：1
+
+######int function
+・概要
+
+・引数
+|型|引数名|概要|
+|-:|:-|:-|
+|H_NETWORK|hNetwork|対象のネットワークハンドラー|
+
+・戻り値 
+正常：0
+異常：1
+
+・エラー判定
+
 ####layerハンドラー
 #####H_LAYER
 #####概要
