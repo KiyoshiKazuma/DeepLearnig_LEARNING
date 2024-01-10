@@ -29,7 +29,7 @@
 |型|変数名|概要|
 |-:|:-|:-|
 |unsigned int|size|NETWORKのサイズ。含まれるLAYERの数。|
-|H_LAYER *|vLayer|NETWORKに含まれているLAYERハンドラへのポインター列|
+|H_LIST|hList_Layer|NETWORKに含まれているLAYERハンドラのリストハンドラ|
 |unsigned int|input_size|ネットワークの入力要素数|
 |unsigned int|output_size|ネットワークの出力要素数|
 
