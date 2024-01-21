@@ -15,10 +15,10 @@ typedef void * H_LIST;
 
 H_LIST create_list(void);
 int delete_list(H_LIST hList);
-void * get_list(H_LIST hList,unsigned int num);
+S_LIST_ELEM * get_list(H_LIST hList,unsigned int num);
 unsigned int find_list(H_LIST hList,void * pElem);
 int append_list(H_LIST hList,void * pElem);
-int remove_list(H_LIST hList,unsigned int num);
+int remove_elem_list(H_LIST hList,unsigned int num);
 
 
 #endif // D_LIST

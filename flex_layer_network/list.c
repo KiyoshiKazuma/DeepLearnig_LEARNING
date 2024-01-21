@@ -30,14 +30,14 @@ int delete_list(H_LIST hList)
     }
     return 0;
 }
-void *get_list(H_LIST hList, unsigned int num)
+S_LIST_ELEM * get_list(H_LIST hList, unsigned int num)
 {
     // NULL check
     if (hList == NULL)
     {
         return NULL;
     }
-    S_LIST *pList = (S_LIST *)pList;
+    S_LIST *pList = (S_LIST *)hList;
     S_LIST_ELEM *pListElem = NULL;
 
     // SIZE check
@@ -50,7 +50,7 @@ void *get_list(H_LIST hList, unsigned int num)
     {
         pListElem = pListElem->pNextList;
     }
-    return pListElem->pElem;
+    return pListElem;
 }
 
 unsigned int find_list(H_LIST hList, void *pElem)
@@ -115,7 +115,7 @@ int append_list(H_LIST hList, void *pElem)
 
     return 0;
 }
-int remove_list(H_LIST hList, unsigned int num)
+int remove_elem_list(H_LIST hList, unsigned int num)
 {
     //NULL CHECK
     if(hList==NULL){

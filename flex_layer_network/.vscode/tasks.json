@@ -8,7 +8,7 @@
 			"args": [
 				"-fdiagnostics-color=always",
 				"-g",
-				"${file}","${workspaceFolder}\\matrix.c","${workspaceFolder}\\layer.c",
+				"${file}","${workspaceFolder}\\matrix.c","${workspaceFolder}\\layer.c","${workspaceFolder}\\list.c",
 				"-o",
 				"${fileDirname}\\${fileBasenameNoExtension}.exe"
 			],
