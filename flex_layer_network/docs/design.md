@@ -29,7 +29,7 @@
 |型|変数名|概要|
 |-:|:-|:-|
 |unsigned int|size|NETWORKのサイズ。含まれるLAYERの数。|
-|H_LIST|hList_Layer|NETWORKに含まれているLAYERハンドラのリストハンドラ|
+|H_LAYER *|vLayer|NETWORKに含まれているLAYERハンドラへのポインター列|
 |unsigned int|input_size|ネットワークの入力要素数|
 |unsigned int|output_size|ネットワークの出力要素数|
 
@@ -608,7 +608,10 @@ numがリストのlengthより大きい
 |H_LIST|hList|対象のリストハンドラー|
 |void *|pElem|検索したい要素のポインタ|
 
+<<<<<<< HEAD
 
+=======
+>>>>>>> cd17164b5fc35f20892e72c69c40e74a65ab8279
 ・戻り値
 正常：要素の番号
 異常/対象なし：0

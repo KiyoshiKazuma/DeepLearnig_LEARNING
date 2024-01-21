@@ -49,12 +49,19 @@ S_LIST_ELEM * get_list(H_LIST hList, unsigned int num)
     for (unsigned int cnt = 1; cnt < num; cnt++)
     {
         pListElem = pListElem->pNextList;
+    pListElem = pList->pFirst;
+    for (unsigned int cnt = 1; cnt < num; cnt++)
+    {
+        pListElem = pListElem->pNextList;
     }
     return pListElem;
 }
 
 unsigned int find_list(H_LIST hList, void *pElem)
 {
+    // NULL check
+    if (hList == NULL)
+    {
     // NULL check
     if (hList == NULL)
     {
