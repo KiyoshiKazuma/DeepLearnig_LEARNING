@@ -247,6 +247,34 @@ void *PointerLayerParameters(H_LAYER hLayer)
     S_LAYER *pLayer = (S_LAYER *)hLayer;
     return pLayer->pLayerParam;
 }
+
+void *PointerLayerParameter(H_LAYER hLayer,unsigned int num)
+{
+    // NULL CEHCK
+    if (hLayer == NULL)
+    {
+        return NULL;
+    }
+    switch(type_layer(hLayer)){
+        case LT_Affine :
+            if(num > 2){
+                return NULL;
+            }
+            break;
+        case LT_SoftmaxWithLoss:
+            if(num > 1){
+                return NULL;
+            }
+            break;
+        default :
+            return NULL;
+    }
+    
+    S_LAYER * pLayer=(S_LAYER *)hLayer;
+    H_MATRIX * vhMatrix=(H_MATRIX *) pLayer->pLayerParam;
+    return vhMatrix[num];
+}
+
 H_MATRIX PointerForwardOutput(H_LAYER hLayer)
 {
     // NULL CEHCK
@@ -403,7 +431,8 @@ int calc_backword(H_LAYER hLayer, H_MATRIX hMatrix)
     case LT_SoftmaxWithLoss:
         break;
     default:
-        if(pMatrix==NULL){
+        if (pMatrix == NULL)
+        {
             return 1;
         }
         if (pMatrix->row != pLayer->output_size || pMatrix->column != 1)
@@ -484,4 +513,33 @@ int calc_backword(H_LAYER hLayer, H_MATRIX hMatrix)
     }
 
     return ret;
+}
+
+unsigned int input_size_layer(H_LAYER hLayer)
+{
+    if (hLayer == NULL)
+    {
+        return 0;
+    }
+    S_LAYER *pLayer = (S_LAYER *)hLayer;
+    return (pLayer->input_size);
+}
+unsigned int output_size_layer(H_LAYER hLayer)
+{
+    if (hLayer == NULL)
+    {
+        return 0;
+    }
+    S_LAYER *pLayer = (S_LAYER *)hLayer;
+    return (pLayer->output_size);
+}
+
+enum LayerType type_layer(H_LAYER hLayer)
+{
+    if (hLayer == NULL)
+    {
+        return 0;
+    }
+    S_LAYER *pLayer = (S_LAYER *)hLayer;
+    return (pLayer->type);
 }

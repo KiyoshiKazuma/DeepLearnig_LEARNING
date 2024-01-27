@@ -21,4 +21,8 @@ int copy_matrix(H_MATRIX hMatix_IN,H_MATRIX hMatix_OUT);
 unsigned int element_value_matrix(H_MATRIX hMatrix,unsigned int i,unsigned int j);
 unsigned int element_num_matrix(H_MATRIX hMatrix,unsigned int i,unsigned int j);
 
+unsigned int row_size_matrix(H_MATRIX hMatrix);
+unsigned int column_size_matrix(H_MATRIX hMatrix);
+unsigned int size_matrix(H_MATRIX hMatrix);
+
 #endif //D_MATRIX

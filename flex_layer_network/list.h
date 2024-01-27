@@ -19,6 +19,7 @@ S_LIST_ELEM * get_list(H_LIST hList,unsigned int num);
 unsigned int find_list(H_LIST hList,void * pElem);
 int append_list(H_LIST hList,void * pElem);
 int remove_elem_list(H_LIST hList,unsigned int num);
+int length_list(H_LIST hList);
 
 
 #endif // D_LIST

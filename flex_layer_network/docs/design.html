@@ -24,8 +24,29 @@
     
       <div class="crossnote markdown-preview  ">
       
-<h1 id="ソフトウェア設計書">ソフトウェア設計書 </h1>
-<h2 id="要件">要件 </h2>
+<p><a id="Index" href=""></a></p>
+<h1 id="目次">目次 </h1>
+<ul>
+<li><a href="#Req">1 要件</a>
+<ul>
+<li><a href="#ReqOverview">1.1 概要</a></li>
+<li><a href="#FunctionOverview">2.2 機能一覧</a></li>
+</ul>
+</li>
+<li><a href="#ArchDesign">2 アーキテクチャ設計</a>
+<ul>
+<li><a href="#ComponentDesign">2.1 コンポーネント設計</a></li>
+<li><a href="#InterfaceDesign">2.2 インターフェイスデザイン</a></li>
+<li><a href="#FunctionDesign">2.3 関数設計</a></li>
+</ul>
+</li>
+<li><a href="#Design">3 詳細設計</a></li>
+</ul>
+<p><a id="Req" href=""></a></p>
+<h1 id="1要件">1.要件 </h1>
+<p><a id="ReqOverview" href=""></a></p>
+<h2 id="11概要">1.1.概要 </h2>
+<p><a href="#Index">目次</a></p>
 <table>
 <thead>
 <tr>
@@ -67,8 +88,9 @@
 </tr>
 </tbody>
 </table>
-<h2 id="設計">設計 </h2>
-<h3 id="機能一覧">機能一覧 </h3>
+<p><a id="FunctionOverview" href=""></a></p>
+<h2 id="12機能一覧">1.2.機能一覧 </h2>
+<p><a href="#Index">目次</a></p>
 <table>
 <thead>
 <tr>
@@ -105,45 +127,50 @@
 </tr>
 </tbody>
 </table>
-<h3 id="インターフェイスデザイン">インターフェイスデザイン </h3>
-<h4 id="networkハンドラー">networkハンドラー </h4>
-<h5 id="h_network">H_NETWORK </h5>
-<h5 id="概要">概要 </h5>
-<p>ニューラルネットワークを構成する複数のレイヤーの構造を保持する。<br>
-ネットワーク全体でのフォワード計算と、誤差逆伝播法による学習を実行する。</p>
-<h5 id="変数-s_network">変数　S_NETWORK </h5>
+<p><a id="ArchDesign" href=""></a></p>
+<h1 id="2アーキテクチャデザイン">2.アーキテクチャデザイン </h1>
+<p><a id="ComponentDesign" href=""></a></p>
+<h2 id="21-コンポーネント設計">2.1 コンポーネント設計 </h2>
+<p><a href="#Index">目次</a></p>
+<h3 id="211-コンポーネント一覧">2.1.1 コンポーネント一覧 </h3>
 <table>
 <thead>
 <tr>
-<th style="text-align:right">型</th>
-<th style="text-align:left">変数名</th>
+<th style="text-align:left">コンポーネント</th>
 <th style="text-align:left">概要</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td style="text-align:right">unsigned int</td>
-<td style="text-align:left">size</td>
-<td style="text-align:left">NETWORKのサイズ。含まれるLAYERの数。</td>
+<td style="text-align:left">network</td>
+<td style="text-align:left">ニューラルネットワークの構成を管理する。</td>
 </tr>
 <tr>
-<td style="text-align:right">H_LAYER *</td>
-<td style="text-align:left">vLayer</td>
-<td style="text-align:left">NETWORKに含まれているLAYERハンドラへのポインター列</td>
+<td style="text-align:left">layer</td>
+<td style="text-align:left">ネットワーク層の構成を管理する。</td>
 </tr>
 <tr>
-<td style="text-align:right">unsigned int</td>
-<td style="text-align:left">input_size</td>
-<td style="text-align:left">ネットワークの入力要素数</td>
+<td style="text-align:left">matrix</td>
+<td style="text-align:left">行列の構成を管理する。</td>
 </tr>
 <tr>
-<td style="text-align:right">unsigned int</td>
-<td style="text-align:left">output_size</td>
-<td style="text-align:left">ネットワークの出力要素数</td>
+<td style="text-align:left">list</td>
+<td style="text-align:left">リストの構成を管理する。</td>
+</tr>
+<tr>
+<td style="text-align:left">file</td>
+<td style="text-align:left">ファイルの入出力を管理する。</td>
+</tr>
+<tr>
+<td style="text-align:left">interface</td>
+<td style="text-align:left">cuiによる操作を管理する。</td>
 </tr>
 </tbody>
 </table>
-<h5 id="機能">機能 </h5>
+<h3 id="212-オブジェクト関係図">2.1.2 オブジェクト関係図 </h3>
+<p><img src="..\www.plantuml.com\plantuml\png\NP0xpeCm48HxdyAYHCBw_pOLIf4AARb1j04N3dwWPIr2JXyUU44qbkQRMTkpPK-059qLuVNMDKclQGZO9cbXr9Y40qBpOSlq9CIMbnTPpT5gWl80U_FL1sby5-bvWY4IKx4yE44QEys2nnZn4BFqWmSWE4QtW0DWSr_IJAzGjmSircAJWM5OhsHI1nkTFy462FRgUL5a_pAJDdLd-gTKdcqxN5obL9BpkOVIRaljc-Zi3m00" alt="オブジェクト関係図"></p>
+<p><a id="FunctionDesign" href=""></a><br>
+<a href="#Index">目次</a></p>
 <h6 id="h_network-create_network">H_NETWORK create_network </h6>
 <p>・概要<br>
 ネットワークハンドラを生成する。<br>
@@ -195,7 +222,7 @@ output_size=0</p>
 </tr>
 <tr>
 <td style="text-align:right">LayerType</td>
-<td style="text-align:left">LayerType</td>
+<td style="text-align:left">type</td>
 <td style="text-align:left">追加するLAYERの種類</td>
 </tr>
 <tr>
@@ -248,7 +275,7 @@ output : 3</p>
 異常：1</p>
 <p>・エラー判定<br>
 引数がNULL</p>
-<h6 id="int-calc_forword">int calc_forword </h6>
+<h6 id="int-calc_network">int calc_network </h6>
 <p>・概要<br>
 ネットワーク順計算を実行し、結果を返す。</p>
 <p>・引数</p>
@@ -290,7 +317,7 @@ output : 3</p>
 引数が一つ以上NULL<br>
 ネットワークの構造が不正<br>
 入力・出力の要素数が不正</p>
-<h6 id="int-calc_backward">int calc_backward </h6>
+<h6 id="int-backpropagation_network">int backpropagation_network </h6>
 <p>・概要<br>
 誤差逆伝播計算を実行し、レイヤーパラメータを更新する。</p>
 <p>・引数</p>
@@ -340,7 +367,7 @@ output : 3</p>
 <p>・エラー判定</p>
 <h4 id="layerハンドラー">layerハンドラー </h4>
 <h5 id="h_layer">H_LAYER </h5>
-<h5 id="概要-1">概要 </h5>
+<h5 id="概要">概要 </h5>
 <p>ニューラルネットワークの１レイヤーの情報を保持する。<br>
 フォワード、バックワードの計算を提供する。<br>
 決まった入力ベクトルのサイズと出力ベクトルのサイズを持つ。</p>
@@ -480,7 +507,7 @@ X[i] &amp;\text{if }X[i]&gt;0
 <span class="katex-display"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><semantics><mrow><mi>L</mi><mo>=</mo><mo>−</mo><munder><mo>∑</mo><mi>i</mi></munder><mi>T</mi><mo stretchy="false">[</mo><mi>i</mi><mo stretchy="false">]</mo><mi>l</mi><mi>n</mi><mo stretchy="false">(</mo><mi>Y</mi><mo stretchy="false">[</mo><mi>i</mi><mo stretchy="false">]</mo><mo stretchy="false">)</mo></mrow><annotation encoding="application/x-tex">L=-\sum_i T[i]ln(Y[i])</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6833em;"></span><span class="mord mathnormal">L</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:2.3277em;vertical-align:-1.2777em;"></span><span class="mord">−</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mop op-limits"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.05em;"><span style="top:-1.8723em;margin-left:0em;"><span class="pstrut" style="height:3.05em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">i</span></span></span><span style="top:-3.05em;"><span class="pstrut" style="height:3.05em;"></span><span><span class="mop op-symbol large-op">∑</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:1.2777em;"><span></span></span></span></span></span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal" style="margin-right:0.13889em;">T</span><span class="mopen">[</span><span class="mord mathnormal">i</span><span class="mclose">]</span><span class="mord mathnormal" style="margin-right:0.01968em;">l</span><span class="mord mathnormal">n</span><span class="mopen">(</span><span class="mord mathnormal" style="margin-right:0.22222em;">Y</span><span class="mopen">[</span><span class="mord mathnormal">i</span><span class="mclose">])</span></span></span></span></span></p>
 <p>・逆伝播関数</p>
 <p><span class="katex-display"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><semantics><mrow><mfrac><mrow><mi mathvariant="normal">∂</mi><mi>L</mi></mrow><mrow><mi mathvariant="normal">∂</mi><mi>X</mi><mo stretchy="false">[</mo><mi>i</mi><mo stretchy="false">]</mo></mrow></mfrac><mo>=</mo><mi>Y</mi><mo stretchy="false">[</mo><mi>i</mi><mo stretchy="false">]</mo><mo>−</mo><mi>T</mi><mo stretchy="false">[</mo><mi>i</mi><mo stretchy="false">]</mo></mrow><annotation encoding="application/x-tex">\frac{\partial L}{\partial X[i]}=Y[i]-T[i]</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:2.3074em;vertical-align:-0.936em;"></span><span class="mord"><span class="mopen nulldelimiter"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.3714em;"><span style="top:-2.314em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord" style="margin-right:0.05556em;">∂</span><span class="mord mathnormal" style="margin-right:0.07847em;">X</span><span class="mopen">[</span><span class="mord mathnormal">i</span><span class="mclose">]</span></span></span><span style="top:-3.23em;"><span class="pstrut" style="height:3em;"></span><span class="frac-line" style="border-bottom-width:0.04em;"></span></span><span style="top:-3.677em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord" style="margin-right:0.05556em;">∂</span><span class="mord mathnormal">L</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.936em;"><span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.22222em;">Y</span><span class="mopen">[</span><span class="mord mathnormal">i</span><span class="mclose">]</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">−</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.13889em;">T</span><span class="mopen">[</span><span class="mord mathnormal">i</span><span class="mclose">]</span></span></span></span></span></p>
-<h5 id="機能-1">機能 </h5>
+<h5 id="機能">機能 </h5>
 <h6 id="h_layer-create_layer">H_LAYER create_layer </h6>
 <p>・概要<br>
 layerハンドラーを生成する。<br>
@@ -680,7 +707,7 @@ layerに順伝播の入力値を渡し、計算結果(pForwardOutput)を更新�
 ・エラー判定<br>
 引数が１つ以上NULL<br>
 計算エラー</p>
-<h6 id="int-calc_backward-1">int calc_backward </h6>
+<h6 id="int-calc_backward">int calc_backward </h6>
 <p>・概要<br>
 layerに誤差逆伝播の入力値を渡し、計算結果(pBackwardOutput)を更新する。</p>
 <p>・引数</p>
@@ -713,7 +740,7 @@ layerに誤差逆伝播の入力値を渡し、計算結果(pBackwardOutput)を�
 計算エラー</p>
 <h4 id="matrixハンドラー">matrixハンドラー </h4>
 <h5 id="h_matrix">H_MATRIX </h5>
-<h5 id="概要-2">概要 </h5>
+<h5 id="概要-1">概要 </h5>
 <p>行列情報の保持と計算を行う。<br>
 行列のフォーマットは 行数:<img src="https://latex.codecogs.com/gif.latex?row">  配列:<img src="https://latex.codecogs.com/gif.latex?column"> で指定する。<br>
 行列の要素数は <img src="https://latex.codecogs.com/gif.latex?size%20=%20row%20*%20column"> となる。<br>
@@ -820,7 +847,7 @@ layerに誤差逆伝播の入力値を渡し、計算結果(pBackwardOutput)を�
 </tr>
 </tbody>
 </table>
-<h5 id="機能-2">機能 </h5>
+<h5 id="機能-1">機能 </h5>
 <h6 id="h_matrix-create_matrix">H_MATRIX create_matrix </h6>
 <p>・概要<br>
 matrixハンドラーを生成する。<br>
@@ -1024,7 +1051,7 @@ matrixの要素を表示する。<br>
 コピー先とコピー元の行列のサイズが異なる</p>
 <h4 id="listハンドラー">listハンドラー </h4>
 <h5 id="h_list">H_LIST </h5>
-<h5 id="概要-3">概要 </h5>
+<h5 id="概要-2">概要 </h5>
 <p>動的リストの生成、削除、要素の取得、要素の検索、要素の追加、要素の削除を行う。</p>
 <h5 id="変数-s_list">変数　S_LIST </h5>
 <table>
@@ -1070,7 +1097,7 @@ matrixの要素を表示する。<br>
 </tr>
 </tbody>
 </table>
-<h5 id="機能-3">機能 </h5>
+<h5 id="機能-2">機能 </h5>
 <h6 id="h_list-create_list">H_LIST create_list </h6>
 <p>・概要<br>
 リストハンドラを生成する。</p>
@@ -1161,26 +1188,9 @@ numがリストのlengthより大きい</p>
 </tr>
 </tbody>
 </table>
-<p>&lt;&lt;&lt;&lt;&lt;&lt;&lt; HEAD</p>
-<p>=======</p>
-<blockquote>
-<blockquote>
-<blockquote>
-<blockquote>
-<blockquote>
-<blockquote>
-<blockquote>
-<p>cd17164b5fc35f20892e72c69c40e74a65ab8279<br>
-・戻り値<br>
+<p>・戻り値<br>
 正常：要素の番号<br>
 異常/対象なし：0</p>
-</blockquote>
-</blockquote>
-</blockquote>
-</blockquote>
-</blockquote>
-</blockquote>
-</blockquote>
 <p>・エラー判定<br>
 引数がNULL</p>
 <h6 id="int-append_list">int append_list </h6>
@@ -1244,7 +1254,48 @@ numがリストのlengthより大きい</p>
 <p>・エラー判定<br>
 引数がNULL<br>
 numがlengthより大きい or num=0</p>
-<h3 id="固定値">固定値 </h3>
+<p><a id="InterfaceDesign" href=""></a></p>
+<h2 id="23-インターフェイスデザイン">2.3 インターフェイスデザイン </h2>
+<p><a href="#Index">目次</a></p>
+<h4 id="networkハンドラー">networkハンドラー </h4>
+<h5 id="h_network">H_NETWORK </h5>
+<h5 id="概要-3">概要 </h5>
+<p>ニューラルネットワークを構成する複数のレイヤーの構造を保持する。<br>
+ネットワーク全体でのフォワード計算と、誤差逆伝播法による学習を実行する。</p>
+<h5 id="変数-s_network">変数　S_NETWORK </h5>
+<table>
+<thead>
+<tr>
+<th style="text-align:right">型</th>
+<th style="text-align:left">変数名</th>
+<th style="text-align:left">概要</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:right">unsigned int</td>
+<td style="text-align:left">size</td>
+<td style="text-align:left">NETWORKのサイズ。含まれるLAYERの数。</td>
+</tr>
+<tr>
+<td style="text-align:right">H_LAYER *</td>
+<td style="text-align:left">vLayer</td>
+<td style="text-align:left">NETWORKに含まれているLAYERハンドラへのポインター列</td>
+</tr>
+<tr>
+<td style="text-align:right">unsigned int</td>
+<td style="text-align:left">input_size</td>
+<td style="text-align:left">ネットワークの入力要素数</td>
+</tr>
+<tr>
+<td style="text-align:right">unsigned int</td>
+<td style="text-align:left">output_size</td>
+<td style="text-align:left">ネットワークの出力要素数</td>
+</tr>
+</tbody>
+</table>
+<h5 id="機能-3">機能 </h5>
+<p>###固定値</p>
 <h4 id="layerタイプlt_">Layerタイプ(LT_*) </h4>
 <table>
 <thead>
@@ -1282,6 +1333,9 @@ numがlengthより大きい or num=0</p>
 </tr>
 </tbody>
 </table>
+<p><a id="Design" href=""></a></p>
+<h1 id="詳細設計">詳細設計 </h1>
+<p><a href="#Index">目次</a></p>
 
       </div>
       

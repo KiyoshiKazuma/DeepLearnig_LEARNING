@@ -1,5 +1,21 @@
-#ソフトウェア設計書
-##要件
+<!-- 目次 -->
+<a id="Index"></a>
+#目次
+- [1 要件](#Req)
+    - [1.1 概要](#ReqOverview)
+    - [2.2 機能一覧](#FunctionOverview)
+- [2 アーキテクチャ設計](#ArchDesign)
+    - [2.1 コンポーネント設計](#ComponentDesign)
+    - [2.2 インターフェイスデザイン](#InterfaceDesign)
+    - [2.3 関数設計](#FunctionDesign)
+- [3 詳細設計](#Design)
+
+<a id="Req"></a>
+#1.要件
+
+<a id="ReqOverview"></a>
+##1.1.概要
+[目次](#Index)
 |要件番号|項目|概要|
 |:-|:-|:-|
 |1|neural network|分岐のないニューラルネットワークを構築できること|
@@ -8,9 +24,10 @@
 |4|Flex-Initialize|ニューラルネットワークの構成を指定して(Layerの組み換え)初期化が可能であること。|
 |5|teacher data file|外部で生成した教師データを読み込んで利用することができること|
 |6|learning state|学習進捗を出力することができること。|
-  
-##設計
-###機能一覧
+
+<a id="FunctionOverview"></a>
+##1.2.機能一覧
+[目次](#Index)
 |機能番号|項目|概要|
 |:-|:-|:-|
 |1|foward calculation|ニューラルネットワークの順方向の計算を実施する。入力の配列に対し計算結果の配列を出力する。|
@@ -18,23 +35,30 @@
 |3|load teacher file|教師データの読み込み。外部ファイルから教師データを読み込む|
 |4|save neural network|ニューラルネットワーク（構成・パラメータ）をファイルに保存する。|
 |5|load neural network|ニューラルネットワーク(構成・パラメータ)のファイルを読み込み、再構成する。|
-  
-###インターフェイスデザイン
-####networkハンドラー
-#####H_NETWORK
-#####概要
-ニューラルネットワークを構成する複数のレイヤーの構造を保持する。
-ネットワーク全体でのフォワード計算と、誤差逆伝播法による学習を実行する。
-#####変数　S_NETWORK
-|型|変数名|概要|
-|-:|:-|:-|
-|unsigned int|size|NETWORKのサイズ。含まれるLAYERの数。|
-|H_LAYER *|vLayer|NETWORKに含まれているLAYERハンドラへのポインター列|
-|unsigned int|input_size|ネットワークの入力要素数|
-|unsigned int|output_size|ネットワークの出力要素数|
 
-#####機能
+<a id="ArchDesign"></a>
+# 2.アーキテクチャデザイン  
 
+<a id="ComponentDesign"></a>
+## 2.1 コンポーネント設計
+[目次](#Index)
+
+### 2.1.1 コンポーネント一覧
+|コンポーネント|概要|
+|:-|:-|
+|network|ニューラルネットワークの構成を管理する。|
+|layer|ネットワーク層の構成を管理する。|
+|matrix|行列の構成を管理する。|
+|list|リストの構成を管理する。|
+|file|ファイルの入出力を管理する。|
+|interface|cuiによる操作を管理する。|
+### 2.1.2 オブジェクト関係図
+![オブジェクト関係図](./object.png)
+
+
+
+<a id="FunctionDesign"></a>
+[目次](#Index)
 ######H_NETWORK create_network
 ・概要
 ネットワークハンドラを生成する。
@@ -59,7 +83,7 @@ output_size=0
 |型|引数名|概要|
 |-:|:-|:-|
 |H_NETWORK|hNetwork|対象のネットワークハンドラー|
-|LayerType|LayerType|追加するLAYERの種類|
+|LayerType|type|追加するLAYERの種類|
 |unsigned int|IF_size|追加するLAYERの出力要素数|
 
 ※IF_sizeはAffineレイヤーのみ必要
@@ -97,7 +121,7 @@ LT_SoftmaxWithLossの後にレイヤーを追加するとき
 ・エラー判定
 引数がNULL
 
-######int calc_forword
+######int calc_network
 ・概要
 ネットワーク順計算を実行し、結果を返す。
 
@@ -118,7 +142,7 @@ LT_SoftmaxWithLossの後にレイヤーを追加するとき
 ネットワークの構造が不正
 入力・出力の要素数が不正
 
-######int calc_backward
+######int backpropagation_network
 ・概要
 誤差逆伝播計算を実行し、レイヤーパラメータを更新する。
 
@@ -608,10 +632,6 @@ numがリストのlengthより大きい
 |H_LIST|hList|対象のリストハンドラー|
 |void *|pElem|検索したい要素のポインタ|
 
-<<<<<<< HEAD
-
-=======
->>>>>>> cd17164b5fc35f20892e72c69c40e74a65ab8279
 ・戻り値
 正常：要素の番号
 異常/対象なし：0
@@ -655,7 +675,28 @@ numがリストのlengthより大きい
 numがlengthより大きい or num=0
 
 
-###固定値
+
+
+<a id="InterfaceDesign"></a>
+## 2.3 インターフェイスデザイン
+[目次](#Index)
+####networkハンドラー
+#####H_NETWORK
+#####概要
+ニューラルネットワークを構成する複数のレイヤーの構造を保持する。
+ネットワーク全体でのフォワード計算と、誤差逆伝播法による学習を実行する。
+#####変数　S_NETWORK
+|型|変数名|概要|
+|-:|:-|:-|
+|unsigned int|size|NETWORKのサイズ。含まれるLAYERの数。|
+|H_LAYER *|vLayer|NETWORKに含まれているLAYERハンドラへのポインター列|
+|unsigned int|input_size|ネットワークの入力要素数|
+|unsigned int|output_size|ネットワークの出力要素数|
+
+#####機能
+  
+
+  ###固定値
 ####Layerタイプ(LT_*)
 |値|名前|概要|
 |-:|:-|:-|
@@ -664,4 +705,7 @@ numがlengthより大きい or num=0
 |3|LT_Affine|Affineレイヤー|
 |4|LT_Softmax|Softmaxレイヤー|
 |5|LT_SoftmaxWithLoss|Sofmax-with-Lossレイヤー|
-  
+
+<a id="Design"></a>
+#詳細設計
+[目次](#Index)

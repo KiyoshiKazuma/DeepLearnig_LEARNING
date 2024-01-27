@@ -50,6 +50,7 @@ S_LIST_ELEM * get_list(H_LIST hList, unsigned int num)
     {
         pListElem = pListElem->pNextList;
     pListElem = pList->pFirst;
+    }
     for (unsigned int cnt = 1; cnt < num; cnt++)
     {
         pListElem = pListElem->pNextList;
@@ -59,10 +60,7 @@ S_LIST_ELEM * get_list(H_LIST hList, unsigned int num)
 
 unsigned int find_list(H_LIST hList, void *pElem)
 {
-    // NULL check
-    if (hList == NULL)
-    {
-    // NULL check
+
     if (hList == NULL)
     {
         return 0;
@@ -149,4 +147,12 @@ int remove_elem_list(H_LIST hList, unsigned int num)
     free(pListElemTarget);
     pList->length--;
     return 0;
+}
+
+int length_list(H_LIST hList){
+    if(hList==NULL){
+        return 0;
+    }
+    S_LIST * pList=(S_LIST *)hList;
+    return pList->length;
 }
