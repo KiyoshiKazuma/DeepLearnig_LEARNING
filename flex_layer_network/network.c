@@ -162,7 +162,9 @@ int calc_network(H_NETWORK hNetwork, H_MATRIX hInput, H_MATRIX hOutput, double *
         return 1;
     }
     // size check
-    if (input_size_network(hNetwork) != row_size_matrix(hInput) || output_size_network(hNetwork) != row_size_matrix(hOutput) || column_size_matrix(hInput) != 1 || column_size_matrix(hInput) != 1)
+    if (input_size_network(hNetwork) != row_size_matrix(hInput) || output_size_network(hNetwork) != row_size_matrix(hOutput) || column_size_matrix(hInput) != 1 || column_size_matrix(hInput) != 1){
+        return 1;
+    }
 
     H_LAYER hLayer = NULL;
     H_MATRIX hInputTmp = NULL;
@@ -187,8 +189,7 @@ int calc_network(H_NETWORK hNetwork, H_MATRIX hInput, H_MATRIX hOutput, double *
     }
     ret=copy_matrix(hOutputTmp,hOutput); 
     hY=PointerLayerParameter(hLayer,0);
-    
-
+    *pLoss = element_value_matrix(hY,0,0);
 
     return 0;
 }

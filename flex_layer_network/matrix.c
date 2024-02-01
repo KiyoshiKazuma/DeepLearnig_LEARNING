@@ -80,14 +80,9 @@ unsigned int element_num_matrix(H_MATRIX hMatrix,unsigned int i,unsigned int j)
         int j   列番号
 戻り値 配列の値
 */
-unsigned int element_value_matrix(H_MATRIX hMatrix,unsigned int i,unsigned int j)
+double element_value_matrix(H_MATRIX hMatrix,unsigned int i,unsigned int j)
 {
     S_MATRIX *pMatrix = (S_MATRIX *)hMatrix;
-    if (i >= pMatrix->row || j >= pMatrix->column)
-    {
-        printf("ERROR:###element_num_matrix###\nmatrix element num out of range\n");
-        return -2;
-    }
     return pMatrix->pElem[element_num_matrix(hMatrix,i,j)];
 }
 

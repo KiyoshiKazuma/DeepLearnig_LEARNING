@@ -56,7 +56,6 @@
 ![オブジェクト関係図](./object.png)
 
 
-
 <a id="FunctionDesign"></a>
 [目次](#Index)
 ######H_NETWORK create_network
@@ -678,8 +677,38 @@ numがlengthより大きい or num=0
 
 
 <a id="InterfaceDesign"></a>
-## 2.3 インターフェイスデザイン
+## 2.2 インターフェイスデザイン
 [目次](#Index)
+### 2.2.3 ハンドラー設計
+####ハンドラ一覧
+|ハンドラ名|プロパティ|メゾット|
+|:-|:-|:-|
+|H_NETWORK|size|create_network| create_matrix|
+|^|hList_Layers|delete_network| delete_matrix|
+|^|input_size|print_network| add_matrix|
+|^|output_size| product_matrix|
+|^| -| transpose_matrix|
+|^| -| print_matrix|
+|^| -| copy_matrix|
+|^| -| element_value_matrix|
+|^| -| element_num_matrix|
+|^| -| row_size_matrix|
+|^| -| column_size_matrix|
+|^| -| size_matrix|
+|H_LAYER|type| create_layer|
+ |^|input_size| delete_layer|
+ |^|output_size| print_layer|
+ |^|pLayerParam| PointerLayerParameters|
+ |^|hForwardOutput| PointerLayerParameter|
+ |^|hBackwardOutput| PointerForwardOutput|
+ |^|-| PointerBackwardOutput|
+ |^|-| calc_forword|
+ |^|-| calc_backword|
+ |^|-| input_size_layer|
+ |^|-| output_size_layer|
+ |^|-| LayerType|
+
+
 ####networkハンドラー
 #####H_NETWORK
 #####概要
