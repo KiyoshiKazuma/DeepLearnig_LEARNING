@@ -3,9 +3,15 @@
 #include <time.h>
 #include "../layer.h"
 
+//(1)レイヤー生成
+//  (1-1)生成が成功すること
+//(2)レイヤー削除
+//  (2-1)削除が成功すること
+//(3)
+
 #define D_TEST_CREATE_LAYER
 #define D_TEST_DELETE_LAYER
-// #define D_TEST_PRINT_LAYER
+#define D_TEST_PRINT_LAYER
 #define D_TEST_P2_LAYER_PARAMS
 #define D_TEST_P2_FORWARD_OUTPUT
 #define D_TEST_P2_BACKWARD_OUTPUT
@@ -44,14 +50,14 @@ S_test_case test[] = {
     // end marker
 };
 
-int test_2_create_layer(void);
-int test_2_delete_layer(void);
-int test_2_print_layer(void);
-int test_2_PointerLayerParameters(void);
-int test_2_PointerForwardOutput(void);
-int test_2_PointerBackwardOutput(void);
-int test_2_calc_forword(void);
-int test_2_calc_backword(void);
+int test_2_layer_1_create_layer(void);
+int test_2_layer_2_delete_layer(void);
+int test_2_layer_3_print_layer(void);
+int test_2_layer_4_PointerLayerParameters(void);
+int test_2_layer_5_PointerForwardOutput(void);
+int test_2_layer_6_PointerBackwardOutput(void);
+int test_2_layer_7_calc_forword(void);
+int test_2_layer_8_calc_backword(void);
 
 int main(void)
 {
@@ -60,7 +66,7 @@ int main(void)
 #ifdef D_TEST_CREATE_LAYER
     printf("RUNNING : test_2_create_layer\n");
     ret = 0;
-    ret = test_2_create_layer();
+    ret = test_2_layer_1_create_layer();
     if (ret != 0)
     {
         printf("error : test_2_create_layer     \nerror id : %d\n", ret);
@@ -77,7 +83,7 @@ int main(void)
 #ifdef D_TEST_DELETE_LAYER
     printf("RUNNING : test_2_delete_layer\n");
     ret = 0;
-    ret = test_2_delete_layer();
+    ret = test_2_layer_2_delete_layer();
     if (ret != 0)
     {
         printf("error : test_2_delete_layer     \nerror id : %d\n", ret);
@@ -94,7 +100,7 @@ int main(void)
 #ifdef D_TEST_PRINT_LAYER
     printf("RUNNING : test_2_print_layer\n");
     ret = 0;
-    ret = test_2_print_layer();
+    ret = test_2_layer_3_print_layer();
     if (ret != 0)
     {
         printf("error : test_2_print_layer      \nerror id : %d\n", ret);
@@ -110,7 +116,7 @@ int main(void)
 
 #ifdef D_TEST_P2_LAYER_PARAMS
     printf("RUNNING : test_2_PointerLayerParameters\n");
-    ret = test_2_PointerLayerParameters();
+    ret = test_2_layer_4_PointerLayerParameters();
     if (ret != 0)
     {
         printf("error : test_2_PointerLayerParameters  \n error id : %d\n , ret");
@@ -126,7 +132,7 @@ int main(void)
 
 #ifdef D_TEST_P2_FORWARD_OUTPUT
     printf("RUNNING : test_2_PointerForwardOutput\n");
-    ret = test_2_PointerForwardOutput();
+    ret = test_2_layer_5_PointerForwardOutput();
     if (ret != 0)
     {
         printf("error : test_2_PointerForwardOutput  \n error id : %d\n , ret");
@@ -142,7 +148,7 @@ int main(void)
 
 #ifdef D_TEST_P2_BACKWARD_OUTPUT
     printf("RUNNING : test_2_PointerBackwardOutput\n");
-    ret = test_2_PointerBackwardOutput();
+    ret = test_2_layer_6_PointerBackwardOutput();
     if (ret != 0)
     {
         printf("error : test_2_PointerBackwardOutput  \n error id : %d\n , ret");
@@ -151,7 +157,7 @@ int main(void)
 
 #ifdef D_TEST_CALC_FORWARD
     printf("RUNNING : test_2_calc_forword\n");
-    ret = test_2_calc_forword();
+    ret = test_2_layer_7_calc_forword();
     if (ret != 0)
     {
         printf("error : test_2_calc_forword     \nerror id : %d\n", ret);
@@ -160,7 +166,7 @@ int main(void)
 
 #ifdef D_TEST_CAL_BACKWARD
     printf("RUNNING : test_2_calc_backward\n");
-    ret = test_2_calc_backword();
+    ret = test_2_layer_8_calc_backword();
     if (ret != 0)
     {
         printf("error : test_2_calc_backword    \nerror id : %d\n", ret);
@@ -170,7 +176,7 @@ int main(void)
     return 0;
 }
 
-int test_2_create_layer(void)
+int test_2_layer_1_create_layer(void)
 {
     int result = 0;
     int ret = 0;
@@ -199,7 +205,7 @@ int test_2_create_layer(void)
 
     return result;
 }
-int test_2_delete_layer(void)
+int test_2_layer_2_delete_layer(void)
 {
     int result = 0;
     int ret = 0;
@@ -229,7 +235,7 @@ int test_2_delete_layer(void)
 
     return result;
 }
-int test_2_print_layer(void)
+int test_2_layer_3_print_layer(void)
 {
     int result = 0;
     int ret = 0;
@@ -247,7 +253,7 @@ int test_2_print_layer(void)
     }
     return result;
 }
-int test_2_PointerLayerParameters(void)
+int test_2_layer_4_PointerLayerParameters(void)
 {
 
     int result = 0;
@@ -341,7 +347,7 @@ int test_2_PointerLayerParameters(void)
 
     return result;
 }
-int test_2_PointerForwardOutput()
+int test_2_layer_5_PointerForwardOutput()
 {
 
     int result = 0;
@@ -380,7 +386,7 @@ int test_2_PointerForwardOutput()
     }
     return result;
 }
-int test_2_PointerBackwardOutput()
+int test_2_layer_6_PointerBackwardOutput()
 {
     int result = 0;
     int ret = 0;
@@ -418,7 +424,7 @@ int test_2_PointerBackwardOutput()
     }
     return result;
 }
-int test_2_calc_forword(void)
+int test_2_layer_7_calc_forword(void)
 {
     int result = 0;
     int ret = 0;
@@ -642,7 +648,7 @@ int test_2_calc_forword(void)
 
     return result;
 }
-int test_2_calc_backword(void)
+int test_2_layer_8_calc_backword(void)
 {
     H_MATRIX hInput = NULL;
     H_MATRIX hOutput = NULL;

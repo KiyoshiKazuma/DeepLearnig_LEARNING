@@ -4,10 +4,16 @@
 #include "../network.h"
 
 //(1)ネットワークを生成できること
-// 　(1-1)生成が成功すること
+//  (1-1)生成が成功すること
 //  (1-2)初期化が正しく実行されていること
 //(2)ネットワークにLAYERを追加できること
+//  (2-1)add関数が正常を返すこと
+//  (2-2)ネットワークの総数がaddした回数と一致すること
+//  (2-3)追加した層のタイプ、サイズが正しいこと
 //(3)フォワード計算が正しく実行できること
+//  (3-1)フォワード計算関数が正常に動作すること
+//  (3-2)outputが期待値通りであること
+//  (3-3)損失値が期待値通りであること
 //(4)誤差逆伝播計算が正しく実行できること
 
 typedef struct
@@ -24,7 +30,20 @@ s_test_case test_case[5] =
      {LT_SoftmaxWithLoss, 1}};
 
 unsigned int IF_size_exp[] = {3, 3, 4, 4, 4, 1};
-
+double input[3] = {-1, 0, 1};
+double affine_params_1[3][4] = {
+    {-0.5, -0.4, -0.3},
+    {-0.2, -0.1, 0},
+    {0.1, 0.2, 0.3},
+    {0.4, 0.5, 0.6}};
+double affine_params_2[4][4] = {
+    {-0.5, -0.4, -0.3, -0.2},
+    {-0.1, 0, 0.1, 0.2},
+    {0.3, 0.4, 0.5, 0.6},
+    {0.7, 0.8, 0.9, 1}};
+double T[4] = {0.1, 0.2, 0.3, 0.4};
+double output_exp[4] = {0.2006937351, 0.2305031957, 0.2647403178, 0.3040627514};
+double Loss_exp = 4.592992837;
 //(1)ネットワークを生成できること
 int test_4_network_1_create(void)
 {
@@ -85,7 +104,7 @@ int test_4_network_2_add(void)
     //  (2-3)追加したLayerが正しく設定されていること
     for (unsigned int i = 0; i < 5; i++)
     {
-        hLayer = get_layer(hList, i + 1);
+        hLayer = get_layer(hNetwork, i + 1);
         enum LayerType type_tmp = type_layer(hLayer);
         unsigned int input_size_tmp = input_size_layer(hLayer);
         unsigned int output_size_tmp = output_size_layer(hLayer);
@@ -100,6 +119,35 @@ int test_4_network_2_add(void)
 
     delete_network(hNetwork);
     return result;
+}
+
+//(3)フォワード計算が正しく実行できること
+int test_4_network_3_calcforward(void)
+{
+    H_NETWORK hNetwork = NULL;
+    H_LIST hList = NULL;
+    H_LAYER hLayer = NULL;
+    int ret = 0;
+    int result = 0;
+    unsigned int input_size = 3;
+    unsigned int output_size = 4;
+
+    hNetwork = create_network(input_size, output_size);
+    hList = list_network(hNetwork);
+
+    for (unsigned int i = 0; i < 5; i++)
+    {
+        ret = add_network(hNetwork, test_case[i].type, test_case[i].IF_size);
+        if (ret != 0)
+        {
+            result += 0x1 << i;
+        }
+    }
+
+    //  (3-1)フォワード計算関数が正常に動作すること
+    //  (3-2)outputが期待値通りであること
+    //  (3-3)損失値が期待値通りであること
+
 }
 
 void main()
