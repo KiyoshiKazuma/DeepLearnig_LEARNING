@@ -248,7 +248,7 @@ void *PointerLayerParameters(H_LAYER hLayer)
     return pLayer->pLayerParam;
 }
 
-void *PointerLayerParameter(H_LAYER hLayer,unsigned int num)
+H_MATRIX PointerLayerParameter(H_LAYER hLayer,unsigned int num)
 {
     // NULL CEHCK
     if (hLayer == NULL)
@@ -362,6 +362,7 @@ int calc_forword(H_LAYER hLayer, H_MATRIX hMatrix)
         if (ret == 0)
         {
             ret += copy_matrix(hOutput2, (void *)pMatrixOutput);
+            ret += copy_matrix(hMatrix,X);
         }
         delete_matrix(hOutput1);
         delete_matrix(hOutput2);
@@ -481,7 +482,7 @@ int calc_backword(H_LAYER hLayer, H_MATRIX hMatrix)
 
         ret = product_matrix(hWt, hMatrix, hOutput);
         ret += product_matrix(hMatrix, hXt, hdW);
-        ret += copy_matrix(hMatrix, hdB);
+        ret += copy_matrix(hMatrix, hdB);   
 
         if (ret == 0)
         {

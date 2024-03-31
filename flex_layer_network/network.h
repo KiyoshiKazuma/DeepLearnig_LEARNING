@@ -25,7 +25,6 @@ unsigned int size_network(H_NETWORK hNetwork);
 unsigned int input_size_network(H_NETWORK hNetwork);
 unsigned int output_size_network(H_NETWORK hNetwork);
 H_LIST list_network(H_NETWORK hNetwork);
-int print_network(H_NETWORK hNetwork);
 H_LAYER get_layer(H_NETWORK hNetwork, unsigned int num);
 
 #endif //D_NETWORK
